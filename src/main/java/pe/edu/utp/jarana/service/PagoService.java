@@ -40,7 +40,7 @@ public class PagoService {
         Usuario operador = usuarios.findByNombreUsuarioIgnoreCase(username).orElseThrow(() -> new ReglaNegocioException("Usuario operador no encontrado"));
         Pago p = new Pago();
         p.setPedido(pedido); p.setMetodo(req.getMetodo()); p.setImporteTotal(total); p.setImporteRecibido(recibido);
-        p.setVuelto(vuelto); p.setOperador(operador); p.setReferencia(req.getReferencia());
+        p.setVuelto(vuelto); p.setOperador(operador);
         p = pagos.save(p);
         auditoria.registrar(username, "REGISTRAR_PAGO", "PEDIDO", String.valueOf(numero), "Pago " + req.getMetodo() + " por S/ " + total);
         return p;

@@ -75,7 +75,6 @@ CREATE TABLE IF NOT EXISTS pagos (
   importe_recibido DECIMAL(10,2) NULL,
   vuelto DECIMAL(10,2) NOT NULL DEFAULT 0,
   id_usuario_operador INT NOT NULL,
-  referencia VARCHAR(100),
   fecha_pago DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_pago_pedido FOREIGN KEY (numero_pedido) REFERENCES pedidos(numero),
   CONSTRAINT fk_pago_operador FOREIGN KEY (id_usuario_operador) REFERENCES usuarios(id_usuario),

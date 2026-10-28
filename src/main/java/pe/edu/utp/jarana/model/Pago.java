@@ -32,9 +32,6 @@ public class Pago {
     @JoinColumn(name = "id_usuario_operador", nullable = false)
     private Usuario operador;
 
-    @Column(length = 100)
-    private String referencia;
-
     @Column(name = "fecha_pago", nullable = false)
     private LocalDateTime fechaPago = LocalDateTime.now();
 
@@ -52,8 +49,6 @@ public class Pago {
     public void setVuelto(BigDecimal vuelto) { this.vuelto = vuelto; }
     public Usuario getOperador() { return operador; }
     public void setOperador(Usuario operador) { this.operador = operador; }
-    public String getReferencia() { return referencia; }
-    public void setReferencia(String referencia) { this.referencia = referencia; }
     public LocalDateTime getFechaPago() { return fechaPago; }
     public void setFechaPago(LocalDateTime fechaPago) { this.fechaPago = fechaPago; }
 }
