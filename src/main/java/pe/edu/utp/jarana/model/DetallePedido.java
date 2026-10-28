@@ -30,6 +30,9 @@ public class DetallePedido {
     @Column(length = 255)
     private String observacion;
 
+    @Column(name = "costo_extra", nullable = false, precision = 8, scale = 2)
+    private BigDecimal costoExtra = BigDecimal.ZERO;
+
     public Integer getIdDetalle() { return idDetalle; }
     public void setIdDetalle(Integer idDetalle) { this.idDetalle = idDetalle; }
     public Pedido getPedido() { return pedido; }
@@ -42,4 +45,6 @@ public class DetallePedido {
     public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
     public String getObservacion() { return observacion; }
     public void setObservacion(String observacion) { this.observacion = observacion; }
+    public BigDecimal getCostoExtra() { return costoExtra == null ? BigDecimal.ZERO : costoExtra; }
+    public void setCostoExtra(BigDecimal costoExtra) { this.costoExtra = costoExtra == null ? BigDecimal.ZERO : costoExtra; }
 }

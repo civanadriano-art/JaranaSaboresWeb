@@ -147,3 +147,13 @@ El administrador puede crear una copia de seguridad y restaurar la última copia
 - El teléfono del cliente es opcional. Si se ingresa, debe contener entre 7 y 9 dígitos.
 - Los pedidos activos ya no tienen un límite fijo de 50.
 - Si la base ya existía, ejecutar `sql/04_telefono_opcional.sql`.
+
+
+## Actualización: extras y pago antes del despacho
+
+- Las observaciones de cada plato siguen siendo opcionales.
+- Cada detalle puede incluir un costo extra opcional.
+- El total del pedido y el cobro incluyen el costo extra.
+- Un pedido listo no puede despacharse hasta que tenga un pago registrado.
+- Medios de pago disponibles: Efectivo, Yape y Plin.
+- Para una base ya creada, ejecutar `sql/05_extra_y_pago_antes_despacho.sql`.

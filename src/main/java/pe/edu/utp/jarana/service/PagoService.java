@@ -27,7 +27,7 @@ public class PagoService {
         Pedido pedido = pedidos.findById(numero).orElseThrow(() -> new ReglaNegocioException("Pedido no encontrado"));
         if (pedido.getEstado() == EstadoPedido.CANCELADO) throw new ReglaNegocioException("No se puede cobrar un pedido cancelado");
         BigDecimal total = pedido.getDetalles().stream()
-                .map(d -> d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())))
+                .map(d -> d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())).add(d.getCostoExtra()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal recibido = req.getImporteRecibido();
         BigDecimal vuelto = BigDecimal.ZERO;

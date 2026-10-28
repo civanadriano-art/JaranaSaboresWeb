@@ -58,10 +58,12 @@ CREATE TABLE IF NOT EXISTS detalle_pedido (
   cantidad INT NOT NULL,
   precio_unitario DECIMAL(8,2) NOT NULL,
   observacion VARCHAR(255),
+  costo_extra DECIMAL(8,2) NOT NULL DEFAULT 0.00,
   CONSTRAINT fk_detalle_pedido FOREIGN KEY (numero_pedido) REFERENCES pedidos(numero),
   CONSTRAINT fk_detalle_producto FOREIGN KEY (codigo_producto) REFERENCES productos(codigo),
   CHECK (cantidad > 0),
-  CHECK (precio_unitario >= 0)
+  CHECK (precio_unitario >= 0),
+  CHECK (costo_extra >= 0)
 );
 
 CREATE TABLE IF NOT EXISTS pagos (

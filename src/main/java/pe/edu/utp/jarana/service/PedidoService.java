@@ -113,6 +113,9 @@ public class PedidoService {
     public PedidoResponse despachar(Integer numero) {
         Pedido pedido = buscarPedido(numero);
         exigirEstado(pedido, EstadoPedido.LISTO, "Solo se pueden despachar pedidos Listos");
+        if (!pagoRepository.existsByPedidoNumero(numero)) {
+            throw new ReglaNegocioException("El pedido debe estar pagado antes de despacharse");
+        }
         pedido.setEstado(EstadoPedido.DESPACHADO);
         pedido.setFechaHoraDespacho(LocalDateTime.now());
         pedido = pedidoRepository.save(pedido);
@@ -200,19 +203,20 @@ public class PedidoService {
             detalle.setCantidad(item.getCantidad());
             detalle.setPrecioUnitario(plato.getPrecio());
             detalle.setObservacion(item.getObservacion());
+            detalle.setCostoExtra(item.getCostoExtra());
             pedido.agregarDetalle(detalle);
         });
     }
 
     private BigDecimal calcularTotal(Pedido pedido) {
         return pedido.getDetalles().stream()
-                .map(d -> d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())))
+                .map(d -> d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())).add(d.getCostoExtra()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private PedidoResponse aResponse(Pedido p) {
         var detalles = p.getDetalles().stream().map(d -> new PedidoResponse.DetalleResponse(
-                d.getPlato().getCodigo(), d.getPlato().getNombre(), d.getCantidad(), d.getPrecioUnitario(), d.getObservacion()
+                d.getPlato().getCodigo(), d.getPlato().getNombre(), d.getCantidad(), d.getPrecioUnitario(), d.getObservacion(), d.getCostoExtra()
         )).toList();
         return new PedidoResponse(p.getNumero(), p.getCliente().getNombre(), p.getCliente().getTelefono(),
                 p.getEstado().getEtiqueta(), p.getFechaHoraRegistro(), calcularTotal(p), detalles);

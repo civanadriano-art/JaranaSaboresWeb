@@ -13,5 +13,5 @@ public record PedidoResponse(
         BigDecimal total,
         List<DetalleResponse> detalles) {
 
-    public record DetalleResponse(Integer codigo, String plato, int cantidad, BigDecimal precioUnitario, String observacion) {}
+    public record DetalleResponse(Integer codigo, String plato, int cantidad, BigDecimal precioUnitario, String observacion, BigDecimal costoExtra) {}
 }
