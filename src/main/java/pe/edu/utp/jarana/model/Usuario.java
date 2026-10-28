@@ -45,6 +45,9 @@ public class Usuario {
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
+    @Column(name = "debe_cambiar_password", nullable = false)
+    private boolean debeCambiarPassword = false;
+
     public Integer getIdUsuario() { return idUsuario; }
     public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
     public String getNombreUsuario() { return nombreUsuario; }
@@ -67,4 +70,6 @@ public class Usuario {
     public void setUltimoAcceso(LocalDateTime ultimoAcceso) { this.ultimoAcceso = ultimoAcceso; }
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+    public boolean isDebeCambiarPassword() { return debeCambiarPassword; }
+    public void setDebeCambiarPassword(boolean debeCambiarPassword) { this.debeCambiarPassword = debeCambiarPassword; }
 }

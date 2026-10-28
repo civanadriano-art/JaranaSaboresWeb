@@ -47,4 +47,17 @@ async function restaurarUltimoBackup(){
   finally{btn.disabled=!BACKUP_DISPONIBLE;btn.innerHTML=original}
 }
 
-document.addEventListener('DOMContentLoaded',cargarEstadoBackup);
+
+async function verificarBackup(){
+  const btn=document.getElementById('btnDiagnostico');const original=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spinner-border spinner-border-sm me-2"></span>Verificando...';
+  try{
+    const d=await api('/api/backups/diagnostico');
+    const ok=d.listo;
+    const dump=d.mysqldump?.disponible?'mysqldump OK':'mysqldump no disponible';
+    const mysql=d.mysql?.disponible?'mysql OK':'mysql no disponible';
+    backupDiagnostico.innerHTML=`<span class="badge ${ok?'text-bg-success':'text-bg-danger'} me-2">${ok?'Listo':'Revisar'}</span>${escapeHtml(dump)} · ${escapeHtml(mysql)} · MySQL ${escapeHtml(d.host)}:${escapeHtml(d.puerto)}/${escapeHtml(d.baseDatos)}`;
+    showToast(ok?'El sistema de backup está listo':'Falta configurar una herramienta de MySQL',ok?'success':'warning');
+  }catch(e){showError(e)}finally{btn.disabled=false;btn.innerHTML=original}
+}
+
+document.addEventListener('DOMContentLoaded',()=>{cargarEstadoBackup();verificarBackup()});

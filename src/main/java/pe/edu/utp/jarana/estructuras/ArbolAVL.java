@@ -9,6 +9,7 @@ public class ArbolAVL<K extends Comparable<K>, V> {
 
     public boolean estaVacio() { return raiz == null; }
     public int getCantidad() { return cantidad; }
+    public void limpiar() { raiz = null; cantidad = 0; }
 
     public boolean insertar(K clave, V valor) {
         int anterior = cantidad;

@@ -157,3 +157,12 @@ El administrador puede crear una copia de seguridad y restaurar la última copia
 - Un pedido listo no puede despacharse hasta que tenga un pago registrado.
 - Medios de pago disponibles: Efectivo, Yape y Plin.
 - Para una base ya creada, ejecutar `sql/05_extra_y_pago_antes_despacho.sql`.
+
+
+## Gestión de usuarios y recuperación de contraseña
+
+El administrador dispone de `/usuarios.html` para crear, activar/desactivar, desbloquear y restablecer contraseñas. Las contraseñas se almacenan con BCrypt. Una contraseña restablecida se considera temporal y obliga al usuario a cambiarla en el siguiente inicio de sesión. Después de 5 intentos fallidos, la cuenta queda bloqueada durante 15 minutos o hasta que un administrador la desbloquee.
+
+## Pruebas
+
+Consulta `PRUEBAS_FUNCIONALES.md` para validar el flujo completo de pedido, cobro, despacho, usuarios y backup/restauración.

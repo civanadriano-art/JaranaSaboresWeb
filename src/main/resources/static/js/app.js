@@ -1,6 +1,8 @@
 let CURRENT_USER=null;
 async function initShell(){
   try{CURRENT_USER=await api('/api/auth/me')}catch{return}
+  const page=location.pathname.split('/').pop()||'dashboard.html';
+  if(CURRENT_USER.debeCambiarPassword && page!=='cambiar-password.html'){location='/cambiar-password.html';return}
   document.querySelectorAll('[data-user-name]').forEach(x=>x.textContent=CURRENT_USER.nombre||CURRENT_USER.usuario);
   document.querySelectorAll('[data-user-role]').forEach(x=>x.textContent=(CURRENT_USER.rol||'').replace('ADMINISTRADOR','Administrador').replace('CAJERO','Caja').replace('COCINERO','Cocina'));
   document.querySelectorAll('[data-role]').forEach(x=>{const allowed=x.dataset.role.split(',');if(!allowed.includes(CURRENT_USER.rol))x.classList.add('d-none')});

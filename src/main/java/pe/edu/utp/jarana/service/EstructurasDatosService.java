@@ -39,6 +39,11 @@ public class EstructurasDatosService {
 
     @PostConstruct
     public synchronized void cargarDesdeBaseDatos() {
+        pedidosPendientes.limpiar();
+        pedidosEliminados.limpiar();
+        catalogoPorNombre.limpiar();
+        platosPorCodigo.clear();
+        historialVentas.limpiar();
         for (EstadoPedido estado : new EstadoPedido[]{EstadoPedido.PENDIENTE, EstadoPedido.EN_PREPARACION, EstadoPedido.LISTO}) {
             pedidoRepository.findByEstadoOrderByNumeroAsc(estado)
                     .forEach(p -> pedidosPendientes.insertar(p.getNumero(), p.getNumero()));

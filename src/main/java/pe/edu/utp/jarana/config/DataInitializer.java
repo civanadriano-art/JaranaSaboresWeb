@@ -50,6 +50,7 @@ public class DataInitializer {
         u.setPasswordSal("BCrypt");
         u.setRol(rol);
         u.setActivo(true);
+        u.setDebeCambiarPassword(false);
         repo.save(u);
     }
 

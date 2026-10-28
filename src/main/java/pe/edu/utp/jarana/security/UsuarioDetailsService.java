@@ -1,10 +1,12 @@
 package pe.edu.utp.jarana.security;
 
+import java.time.LocalDateTime;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pe.edu.utp.jarana.model.Usuario;
 import pe.edu.utp.jarana.repository.UsuarioRepository;
 
@@ -15,13 +17,22 @@ public class UsuarioDetailsService implements UserDetailsService {
     public UsuarioDetailsService(UsuarioRepository repo) { this.repo = repo; }
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario u = repo.findByNombreUsuarioIgnoreCase(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        if (u.getBloqueadoHasta() != null && !u.getBloqueadoHasta().isAfter(LocalDateTime.now())) {
+            u.setBloqueadoHasta(null);
+            u.setIntentosFallidos(0);
+            repo.save(u);
+        }
+        boolean bloqueado = u.getBloqueadoHasta() != null && u.getBloqueadoHasta().isAfter(LocalDateTime.now());
         return User.withUsername(u.getNombreUsuario())
                 .password(u.getPasswordHash())
                 .roles(u.getRol().name())
                 .disabled(!u.isActivo())
+                .accountLocked(bloqueado)
                 .build();
     }
 }

@@ -25,6 +25,11 @@ public class BackupController {
         return backups.estado();
     }
 
+    @GetMapping("/diagnostico")
+    public Map<String, Object> diagnostico() {
+        return backups.diagnostico();
+    }
+
     @PostMapping
     public Map<String, Object> crear(Principal principal) {
         Map<String, Object> r = backups.crearBackup();

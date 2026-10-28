@@ -16,12 +16,19 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pe.edu.utp.jarana.exception.ReglaNegocioException;
 
 @Service
 public class BackupService {
+
+    private final EstructurasDatosService estructuras;
+
+    public BackupService(EstructurasDatosService estructuras) {
+        this.estructuras = estructuras;
+    }
 
     private static final DateTimeFormatter NOMBRE_FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
     private static final Pattern JDBC_MYSQL = Pattern.compile("jdbc:mysql://([^:/?#]+)(?::(\\d+))?/([^?]+)");
@@ -55,6 +62,46 @@ public class BackupService {
         return respuesta;
     }
 
+
+    public Map<String, Object> diagnostico() {
+        ConfigDb db = configDb();
+        Map<String, Object> r = new LinkedHashMap<>();
+        r.put("host", db.host());
+        r.put("puerto", db.port());
+        r.put("baseDatos", db.database());
+        r.put("directorio", directorio().toAbsolutePath().normalize().toString());
+        r.put("mysqldump", verificarHerramienta(mysqldumpCommand, "mysqldump"));
+        r.put("mysql", verificarHerramienta(mysqlCommand, "mysql"));
+        r.put("listo", Boolean.TRUE.equals(((Map<?,?>) r.get("mysqldump")).get("disponible"))
+                && Boolean.TRUE.equals(((Map<?,?>) r.get("mysql")).get("disponible")));
+        return r;
+    }
+
+    private Map<String, Object> verificarHerramienta(String configurado, String base) {
+        Map<String, Object> info = new LinkedHashMap<>();
+        try {
+            String ejecutable = resolverEjecutable(configurado, base);
+            ProcessBuilder pb = new ProcessBuilder(ejecutable, "--version");
+            pb.redirectErrorStream(true);
+            Process proceso = pb.start();
+            boolean termino = proceso.waitFor(5, TimeUnit.SECONDS);
+            if (!termino) {
+                proceso.destroyForcibly();
+                info.put("disponible", false);
+                info.put("detalle", "La verificación excedió 5 segundos");
+                return info;
+            }
+            String salida = new String(proceso.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+            info.put("disponible", proceso.exitValue() == 0);
+            info.put("ejecutable", ejecutable);
+            info.put("version", salida.length() > 180 ? salida.substring(0, 180) : salida);
+        } catch (Exception e) {
+            info.put("disponible", false);
+            info.put("detalle", e.getMessage());
+        }
+        return info;
+    }
+
     public Map<String, Object> crearBackup() {
         Path archivo = crearBackupInterno("backup");
         Map<String, Object> r = new LinkedHashMap<>();
@@ -72,6 +119,7 @@ public class BackupService {
         // Copia preventiva del estado actual. No se usa como objetivo de esta restauración.
         Path preventivo = crearBackupInterno("pre_restauracion");
         restaurar(objetivo);
+        estructuras.cargarDesdeBaseDatos();
 
         Map<String, Object> r = new LinkedHashMap<>();
         r.put("mensaje", "Base de datos restaurada correctamente");

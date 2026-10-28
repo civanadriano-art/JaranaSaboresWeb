@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   intentos_fallidos INT NOT NULL DEFAULT 0,
   bloqueado_hasta DATETIME NULL,
   ultimo_acceso DATETIME NULL,
-  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  debe_cambiar_password BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS clientes (

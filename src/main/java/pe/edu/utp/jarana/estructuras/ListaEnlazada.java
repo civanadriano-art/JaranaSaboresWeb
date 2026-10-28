@@ -50,6 +50,7 @@ public class ListaEnlazada<T> {
         return salida;
     }
 
+    public void limpiar() { inicio = fin = null; cantidad = 0; }
     public boolean estaVacia() { return inicio == null; }
     public int getCantidad() { return cantidad; }
     public Nodo<T> getInicio() { return inicio; }
