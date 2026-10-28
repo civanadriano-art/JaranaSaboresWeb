@@ -34,6 +34,18 @@ public class PlatoController {
         return p;
     }
 
+    @PatchMapping("/{codigo}/disponibilidad")
+    public Plato cambiarDisponibilidad(@PathVariable Integer codigo, @RequestParam boolean disponible, Principal principal) {
+        Plato p = service.cambiarDisponibilidad(codigo, disponible);
+        auditoria.registrar(
+                principal.getName(),
+                disponible ? "MARCAR_PLATO_DISPONIBLE" : "MARCAR_PLATO_AGOTADO",
+                "PLATO",
+                String.valueOf(codigo),
+                p.getNombre());
+        return p;
+    }
+
     @DeleteMapping("/{codigo}") @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable Integer codigo, Principal principal) {
         service.desactivar(codigo);

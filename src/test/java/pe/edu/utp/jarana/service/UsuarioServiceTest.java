@@ -54,4 +54,25 @@ class UsuarioServiceTest {
         assertEquals(0, u.getIntentosFallidos());
         assertNull(u.getBloqueadoHasta());
     }
+    @Test
+    void noPermiteDesactivarUltimoAdministradorActivo() {
+        UsuarioRepository repo = mock(UsuarioRepository.class);
+        Usuario u = new Usuario();
+        u.setIdUsuario(1);
+        u.setNombreUsuario("admin2");
+        u.setNombre("Administrador Dos");
+        u.setRol(RolUsuario.ADMINISTRADOR);
+        u.setActivo(true);
+        when(repo.findById(1)).thenReturn(Optional.of(u));
+        when(repo.countByRolAndActivoTrue(RolUsuario.ADMINISTRADOR)).thenReturn(1L);
+        var service = new UsuarioService(repo, new BCryptPasswordEncoder());
+
+        var ex = assertThrows(pe.edu.utp.jarana.exception.ReglaNegocioException.class,
+                () -> service.cambiarEstado(1, false, "otroAdmin"));
+
+        assertTrue(ex.getMessage().toLowerCase().contains("administrador"));
+        assertTrue(u.isActivo());
+        verify(repo, never()).save(any(Usuario.class));
+    }
+
 }

@@ -1,5 +1,149 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Catálogo de platos | La Jarana de Sabores</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="/css/app.css"></head><body><div class="app-shell">
-<header class="topbar"><button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button><a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a><div class="user-chip"><div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div><div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a></div></header>
-<aside class="sidebar"><div class="sidebar-section">Operación</div><a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Inicio</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a><a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a><div class="sidebar-section">Administración</div><a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/usuarios.html"><span class="nav-icon">♙</span>Usuarios</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a></aside>
-<main class="main"><div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4"><div><h1 class="page-title">Catálogo de platos</h1><p class="page-subtitle">Administra nombres, categorías, precios y disponibilidad.</p></div></div>
-<div class="row g-4"><div class="col-lg-4"><section class="section-card p-4"><h5 class="fw-bold mb-3">Datos del plato</h5><form id="formPlato"><input type="hidden" id="codigo"><div class="mb-3"><label class="form-label">Nombre</label><input id="nombre" class="form-control" required></div><div class="mb-3"><label class="form-label">Categoría</label><select id="categoria" class="form-select" required><option>Platos de fondo</option><option>Entradas</option><option>Broaster</option><option>Parrillas</option><option>Bebidas</option><option>Postres</option></select></div><div class="mb-3"><label class="form-label">Precio</label><div class="input-group"><span class="input-group-text">S/</span><input id="precio" type="number" min="0" step="0.10" class="form-control" required></div></div><div class="form-check form-switch mb-4"><input id="disponible" class="form-check-input" type="checkbox" checked><label class="form-check-label" for="disponible">Disponible para pedidos</label></div><button class="btn btn-jarana w-100">Guardar plato</button><button type="button" onclick="limpiar()" class="btn btn-link text-secondary w-100 mt-2">Limpiar formulario</button></form></section></div><div class="col-lg-8"><section class="section-card overflow-hidden"><div class="p-4 border-bottom"><h5 class="fw-bold mb-1">Platos registrados</h5><small class="text-muted">El catálogo se ordena por nombre y mantiene un índice HashMap por código en Java.</small></div><div id="tabla" class="table-responsive"></div></section></div></div></main></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="/js/api.js"></script><script src="/js/app.js"></script><script src="/js/catalogo.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Catálogo de platos | La Jarana de Sabores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button>
+    <a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a>
+    <div class="user-chip">
+      <div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div>
+      <div class="user-avatar">U</div>
+      <a class="btn btn-sm btn-light" href="/logout">Salir</a>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">Operación</div>
+    <a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Inicio</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a>
+    <a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a>
+    <div class="sidebar-section">Administración</div>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/usuarios.html"><span class="nav-icon">♙</span>Usuarios</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a>
+  </aside>
+
+  <main class="main catalog-page">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+      <div>
+        <h1 class="page-title">Catálogo de platos</h1>
+        <p class="page-subtitle">Administra los platos disponibles para la venta.</p>
+      </div>
+      <button class="btn btn-jarana" type="button" onclick="abrirNuevo()">＋ Nuevo plato</button>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-4">
+        <div class="kpi-card">
+          <div class="kpi-head"><div><div class="kpi-label">Total de platos</div><div class="kpi-value" id="kpiTotal">0</div></div><div class="kpi-icon">☷</div></div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="kpi-card">
+          <div class="kpi-head"><div><div class="kpi-label">Disponibles</div><div class="kpi-value" id="kpiDisponibles">0</div></div><div class="kpi-icon">✓</div></div>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="kpi-card">
+          <div class="kpi-head"><div><div class="kpi-label">Agotados</div><div class="kpi-value" id="kpiAgotados">0</div></div><div class="kpi-icon">!</div></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="section-card mb-4">
+      <div class="p-4">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-5">
+            <label class="form-label" for="buscarPlato">Buscar plato</label>
+            <div class="input-group catalog-search-group">
+              <span class="input-group-text">⌕</span>
+              <input id="buscarPlato" class="form-control" placeholder="Nombre o código, por ejemplo P004">
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label" for="filtroCategoria">Categoría</label>
+            <select id="filtroCategoria" class="form-select"><option value="">Todas</option></select>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <label class="form-label" for="filtroDisponibilidad">Disponibilidad</label>
+            <select id="filtroDisponibilidad" class="form-select">
+              <option value="">Todas</option>
+              <option value="disponible">Disponibles</option>
+              <option value="agotado">Agotados</option>
+            </select>
+          </div>
+          <div class="col-12 col-lg-1 d-grid">
+            <button class="btn btn-outline-secondary" type="button" onclick="limpiarFiltros()" title="Limpiar filtros">↺</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card overflow-hidden">
+      <div class="p-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h5 class="fw-bold mb-1">Platos registrados</h5>
+          <small class="text-muted" id="resultadoCatalogo">0 platos encontrados</small>
+        </div>
+      </div>
+      <div id="tabla" class="table-responsive"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal crear / editar -->
+<div class="modal fade" id="modalPlato" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content catalog-modal">
+      <div class="modal-header">
+        <div><h5 class="modal-title fw-bold" id="modalPlatoTitulo">Nuevo plato</h5><div class="text-muted small" id="modalPlatoSubtitulo">Completa los datos del plato.</div></div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <form id="formPlato">
+        <div class="modal-body">
+          <input type="hidden" id="codigo">
+          <div class="mb-3">
+            <label class="form-label" for="nombre">Nombre</label>
+            <input id="nombre" class="form-control" maxlength="100" required placeholder="Ej. Ají de Gallina">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="categoria">Categoría</label>
+            <select id="categoria" class="form-select" required>
+              <option>Platos de fondo</option><option>Entradas</option><option>Broaster</option><option>Parrillas</option><option>Bebidas</option><option>Postres</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="precio">Precio</label>
+            <div class="input-group"><span class="input-group-text">S/</span><input id="precio" type="number" min="0" step="0.10" class="form-control" required placeholder="0.00"></div>
+          </div>
+          <div class="form-check form-switch">
+            <input id="disponible" class="form-check-input" type="checkbox" checked>
+            <label class="form-check-label" for="disponible">Disponible para pedidos</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-jarana" id="btnGuardarPlato">Guardar plato</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/catalogo.js"></script>
+</body>
+</html>

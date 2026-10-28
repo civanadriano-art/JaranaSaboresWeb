@@ -127,7 +127,9 @@ public class PedidoService {
         venta.setFechaHoraDespacho(pedido.getFechaHoraDespacho());
         venta.setTotal(calcularTotal(pedido));
         if (pedido.getFechaHoraInicioPreparacion() != null && pedido.getFechaHoraListo() != null) {
-            venta.setMinutosCocina(Duration.between(pedido.getFechaHoraInicioPreparacion(), pedido.getFechaHoraListo()).toMinutes());
+            long segundos = Duration.between(pedido.getFechaHoraInicioPreparacion(), pedido.getFechaHoraListo()).getSeconds();
+            long minutos = segundos <= 0 ? 1 : Math.max(1, (segundos + 59) / 60);
+            venta.setMinutosCocina(minutos);
         }
         venta = ventaRepository.save(venta);
         estructuras.registrarVenta(venta.getIdVenta());

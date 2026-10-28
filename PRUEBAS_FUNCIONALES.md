@@ -47,3 +47,25 @@ Ingresar como Administrador y abrir **Backup**.
 6. Al finalizar, la base debe volver al estado del backup seleccionado y las estructuras AVL/listas/HashMap se recargan desde MySQL.
 
 > La restauración reemplaza los datos actuales por los del backup. Realizarla solo con datos de prueba durante la validación.
+
+## Reportes e indicadores
+1. Registra, prepara, marca listo, cobra y despacha al menos tres pedidos usando Efectivo, Yape y Plin.
+2. Entra a **Reportes** y comprueba que Total vendido y Pedidos despachados coincidan con las ventas realizadas.
+3. Verifica que Ticket promedio = Total vendido / Pedidos despachados.
+4. Comprueba que el Plato más vendido muestre también la cantidad vendida.
+5. Prueba los filtros Hoy, Esta semana, Este mes y un rango personalizado.
+6. Filtra por Efectivo, Yape y Plin y comprueba que las tarjetas, gráficos y tabla cambien conjuntamente.
+7. Confirma que Tiempo promedio de preparación no muestre 0 min para pedidos que sí pasaron por Cocina.
+8. Usa **Exportar Excel** y verifica que el archivo CSV abra correctamente en Excel.
+9. Usa **Exportar PDF** y guarda el reporte desde el cuadro de impresión del navegador.
+
+## Gestión de usuarios mejorada
+1. Ingresar como administrador y abrir **Usuarios**.
+2. Verificar los indicadores: Usuarios, Activos, Bloqueados e Inactivos.
+3. Buscar por nombre y por nombre de usuario.
+4. Filtrar por rol (Administrador/Cajero/Cocinero) y por estado (Activo/Bloqueado/Inactivo).
+5. Crear un usuario comprobando que las dos contraseñas temporales coincidan.
+6. Restablecer la contraseña de otro usuario y confirmar que aparezca **Cambio de clave pendiente**.
+7. Confirmar que la cuenta actualmente conectada muestre **Cambiar mi contraseña** y no permita desactivarse desde la pantalla.
+8. Bloquear un usuario mediante intentos fallidos, comprobar el estado **Bloqueado** y usar **Desbloquear**.
+9. Si solo existe un administrador activo, comprobar que el backend rechace su desactivación.

@@ -166,3 +166,16 @@ El administrador dispone de `/usuarios.html` para crear, activar/desactivar, des
 ## Pruebas
 
 Consulta `PRUEBAS_FUNCIONALES.md` para validar el flujo completo de pedido, cobro, despacho, usuarios y backup/restauración.
+
+## Reportes mejorados
+La pantalla **Reportes e indicadores** incluye filtros rápidos (Hoy, Esta semana, Este mes y Todos), rango personalizado, filtro por Efectivo/Yape/Plin, total vendido, pedidos despachados, ticket promedio, plato más vendido, tiempo promedio de preparación, ventas por día, distribución por método de pago y detalle de ventas. El reporte puede imprimirse/guardarse como PDF desde el navegador y exportarse a CSV compatible con Excel.
+
+El tiempo de preparación se calcula desde el inicio de preparación hasta que el pedido se marca Listo. Cuando una prueba dura menos de un minuto, se registra como 1 minuto para evitar reportes con `0 min`.
+
+Si ya existen ventas antiguas con `0 min`, ejecutar una sola vez `sql/10_corregir_tiempos_reportes.sql` en MySQL Workbench. El script recalcula el tiempo únicamente cuando el pedido conserva las fechas de inicio de preparación y de Listo.
+
+## Gestión de usuarios mejorada
+La pantalla de administración de usuarios incorpora búsqueda por nombre/usuario, filtros por rol y estado, indicadores de cuentas activas/bloqueadas/inactivas, confirmación de contraseñas temporales y acciones contextuales. La cuenta conectada no puede desactivarse desde la interfaz y el backend impide desactivar al último administrador activo.
+
+## Catálogo mejorado
+La pantalla de catálogo incluye indicadores de total, disponibles y agotados; búsqueda por nombre/código; filtros por categoría y disponibilidad; alta/edición en modal; y cambio rápido entre disponible y agotado. No se muestra una columna ni filtro de estado.

@@ -52,6 +52,16 @@ public class PlatoService {
     }
 
     @Transactional
+    public Plato cambiarDisponibilidad(Integer codigo, boolean disponible) {
+        Plato p = buscar(codigo);
+        estructuras.retirarPlato(p);
+        p.setDisponible(disponible);
+        p = platoRepository.save(p);
+        estructuras.registrarPlato(p);
+        return p;
+    }
+
+    @Transactional
     public void desactivar(Integer codigo) {
         Plato p = buscar(codigo);
         estructuras.retirarPlato(p);

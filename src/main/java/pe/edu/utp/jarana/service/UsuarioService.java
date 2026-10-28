@@ -9,6 +9,7 @@ import pe.edu.utp.jarana.dto.CambiarPasswordRequest;
 import pe.edu.utp.jarana.dto.CrearUsuarioRequest;
 import pe.edu.utp.jarana.dto.UsuarioResponse;
 import pe.edu.utp.jarana.exception.ReglaNegocioException;
+import pe.edu.utp.jarana.model.RolUsuario;
 import pe.edu.utp.jarana.model.Usuario;
 import pe.edu.utp.jarana.repository.UsuarioRepository;
 
@@ -53,6 +54,10 @@ public class UsuarioService {
         Usuario u = buscar(id);
         if (!activo && u.getNombreUsuario().equalsIgnoreCase(usuarioActual)) {
             throw new ReglaNegocioException("No puedes desactivar tu propia cuenta");
+        }
+        if (!activo && u.getRol() == RolUsuario.ADMINISTRADOR && u.isActivo()
+                && usuarios.countByRolAndActivoTrue(RolUsuario.ADMINISTRADOR) <= 1) {
+            throw new ReglaNegocioException("Debe permanecer al menos un administrador activo");
         }
         u.setActivo(activo);
         if (activo) {

@@ -1,10 +1,132 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Usuarios | La Jarana de Sabores</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="/css/app.css"></head><body><div class="app-shell">
-<header class="topbar"><button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button><a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a><div class="user-chip"><div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div><div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a></div></header>
-<aside class="sidebar"><div class="sidebar-section">Operación</div><a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Inicio</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a><a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a><div class="sidebar-section">Administración</div><a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/usuarios.html"><span class="nav-icon">♙</span>Usuarios</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a></aside>
-<main class="main"><div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4"><div><h1 class="page-title">Gestión de usuarios</h1><p class="page-subtitle">Crea cuentas, controla accesos y recupera contraseñas.</p></div><button class="btn btn-jarana" data-bs-toggle="modal" data-bs-target="#modalNuevo">+ Nuevo usuario</button></div>
-<div class="row g-3 mb-4"><div class="col-md-4"><div class="section-card p-4"><div class="text-muted small">Usuarios registrados</div><div class="fs-3 fw-bold" id="kpiTotal">0</div></div></div><div class="col-md-4"><div class="section-card p-4"><div class="text-muted small">Activos</div><div class="fs-3 fw-bold" id="kpiActivos">0</div></div></div><div class="col-md-4"><div class="section-card p-4"><div class="text-muted small">Bloqueados</div><div class="fs-3 fw-bold" id="kpiBloqueados">0</div></div></div></div>
-<section class="section-card overflow-hidden"><div class="p-4 border-bottom"><h5 class="fw-bold mb-1">Cuentas del sistema</h5><small class="text-muted">Las contraseñas nunca se muestran. Al restablecer una clave se asigna una temporal y el usuario debe cambiarla al iniciar sesión.</small></div><div id="usuariosTabla" class="table-responsive"></div></section>
-</main></div>
-<div class="modal fade" id="modalNuevo" tabindex="-1"><div class="modal-dialog"><form class="modal-content" id="nuevoUsuarioForm"><div class="modal-header"><h5 class="modal-title">Nuevo usuario</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="mb-3"><label class="form-label">Nombre completo</label><input id="nuevoNombre" class="form-control" maxlength="100" required></div><div class="mb-3"><label class="form-label">Usuario</label><input id="nuevoLogin" class="form-control" minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]+" required></div><div class="mb-3"><label class="form-label">Rol</label><select id="nuevoRol" class="form-select" required><option value="CAJERO">Cajero</option><option value="COCINERO">Cocinero</option><option value="ADMINISTRADOR">Administrador</option></select></div><div class="mb-2"><label class="form-label">Contraseña temporal</label><input id="nuevoPassword" type="password" class="form-control" minlength="8" maxlength="72" required></div><div class="form-text">El usuario deberá cambiar esta contraseña al ingresar.</div></div><div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-jarana">Crear usuario</button></div></form></div></div>
-<div class="modal fade" id="modalPassword" tabindex="-1"><div class="modal-dialog"><form class="modal-content" id="passwordForm"><div class="modal-header"><h5 class="modal-title">Restablecer contraseña</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p class="text-muted small">Cuenta: <strong id="passwordUsuario"></strong></p><input type="hidden" id="passwordId"><div class="mb-2"><label class="form-label">Nueva contraseña temporal</label><input id="passwordTemporal" type="password" class="form-control" minlength="8" maxlength="72" required></div><div class="form-text">La contraseña se guardará con BCrypt y deberá cambiarse en el siguiente ingreso.</div></div><div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-danger">Restablecer</button></div></form></div></div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="/js/api.js"></script><script src="/js/app.js"></script><script src="/js/usuarios.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Usuarios | La Jarana de Sabores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button>
+    <a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a>
+    <div class="user-chip">
+      <div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div>
+      <div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">Operación</div>
+    <a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Inicio</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a>
+    <a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a>
+    <div class="sidebar-section">Administración</div>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/usuarios.html"><span class="nav-icon">♙</span>Usuarios</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a>
+  </aside>
+
+  <main class="main users-page">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+      <div>
+        <h1 class="page-title">Gestión de usuarios</h1>
+        <p class="page-subtitle">Administra cuentas, permisos y acceso al sistema.</p>
+      </div>
+      <button class="btn btn-jarana" data-bs-toggle="modal" data-bs-target="#modalNuevo">+ Nuevo usuario</button>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-xl-3"><div class="kpi-card"><div class="kpi-head"><div><div class="kpi-label">Usuarios</div><div class="kpi-value" id="kpiTotal">0</div></div><div class="kpi-icon">♙</div></div></div></div>
+      <div class="col-6 col-xl-3"><div class="kpi-card"><div class="kpi-head"><div><div class="kpi-label">Activos</div><div class="kpi-value" id="kpiActivos">0</div></div><div class="kpi-icon">✓</div></div></div></div>
+      <div class="col-6 col-xl-3"><div class="kpi-card"><div class="kpi-head"><div><div class="kpi-label">Bloqueados</div><div class="kpi-value" id="kpiBloqueados">0</div></div><div class="kpi-icon">!</div></div></div></div>
+      <div class="col-6 col-xl-3"><div class="kpi-card"><div class="kpi-head"><div><div class="kpi-label">Inactivos</div><div class="kpi-value" id="kpiInactivos">0</div></div><div class="kpi-icon">○</div></div></div></div>
+    </div>
+
+    <section class="section-card mb-4">
+      <div class="p-4 border-bottom">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <h5 class="fw-bold mb-1">Buscar y filtrar</h5>
+            <small class="text-muted">Encuentra una cuenta por nombre o usuario y filtra por rol o estado.</small>
+          </div>
+          <button id="limpiarFiltros" type="button" class="btn btn-sm btn-outline-secondary">Limpiar filtros</button>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <label class="form-label" for="buscarUsuario">Buscar usuario</label>
+            <div class="input-group user-search-group"><span class="input-group-text">⌕</span><input id="buscarUsuario" class="form-control" placeholder="Nombre o usuario..." autocomplete="off"></div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <label class="form-label" for="filtroRol">Rol</label>
+            <select id="filtroRol" class="form-select"><option value="">Todos</option><option value="ADMINISTRADOR">Administrador</option><option value="CAJERO">Cajero</option><option value="COCINERO">Cocinero</option></select>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <label class="form-label" for="filtroEstado">Estado</label>
+            <select id="filtroEstado" class="form-select"><option value="">Todos</option><option value="ACTIVO">Activo</option><option value="BLOQUEADO">Bloqueado</option><option value="INACTIVO">Inactivo</option></select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card overflow-hidden">
+      <div class="p-4 border-bottom d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <h5 class="fw-bold mb-1">Cuentas del sistema</h5>
+          <small class="text-muted">Las contraseñas nunca se muestran. Una clave restablecida es temporal y debe cambiarse al iniciar sesión.</small>
+        </div>
+        <span id="resultadoUsuarios" class="badge rounded-pill text-bg-light border">0 resultados</span>
+      </div>
+      <div id="usuariosTabla" class="table-responsive"></div>
+    </section>
+  </main>
+</div>
+
+<div class="modal fade" id="modalNuevo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" id="nuevoUsuarioForm">
+      <div class="modal-header"><div><h5 class="modal-title">Nuevo usuario</h5><small class="text-muted">Crea una cuenta para el personal del restaurante.</small></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-3"><label class="form-label">Nombre completo</label><input id="nuevoNombre" class="form-control" maxlength="100" placeholder="Ej. María López" required></div>
+        <div class="mb-3"><label class="form-label">Usuario</label><input id="nuevoLogin" class="form-control" minlength="3" maxlength="50" pattern="[A-Za-z0-9._-]+" placeholder="Ej. maria.caja" required><div class="form-text">Solo letras, números, punto, guion y guion bajo.</div></div>
+        <div class="mb-3"><label class="form-label">Rol</label><select id="nuevoRol" class="form-select" required><option value="CAJERO">Cajero</option><option value="COCINERO">Cocinero</option><option value="ADMINISTRADOR">Administrador</option></select></div>
+        <div class="row g-3">
+          <div class="col-sm-6"><label class="form-label">Contraseña temporal</label><input id="nuevoPassword" type="password" class="form-control" minlength="8" maxlength="72" autocomplete="new-password" required></div>
+          <div class="col-sm-6"><label class="form-label">Confirmar contraseña</label><input id="nuevoPasswordConfirm" type="password" class="form-control" minlength="8" maxlength="72" autocomplete="new-password" required></div>
+        </div>
+        <div class="security-note mt-3"><strong>Primer ingreso:</strong> el usuario deberá reemplazar esta contraseña temporal por una propia.</div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-jarana">Crear usuario</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="modalPassword" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" id="passwordForm">
+      <div class="modal-header"><div><h5 class="modal-title">Restablecer contraseña</h5><small class="text-muted">Asigna una contraseña temporal a la cuenta.</small></div><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="user-reset-summary mb-3">Usuario: <strong id="passwordUsuario"></strong></div>
+        <input type="hidden" id="passwordId">
+        <div class="mb-3"><label class="form-label">Nueva contraseña temporal</label><input id="passwordTemporal" type="password" class="form-control" minlength="8" maxlength="72" autocomplete="new-password" required></div>
+        <div class="mb-3"><label class="form-label">Confirmar contraseña</label><input id="passwordTemporalConfirm" type="password" class="form-control" minlength="8" maxlength="72" autocomplete="new-password" required></div>
+        <div class="form-check rounded border p-3 ps-5 bg-light"><input class="form-check-input" type="checkbox" checked disabled id="forzarCambio"><label class="form-check-label" for="forzarCambio">El usuario deberá cambiarla al iniciar sesión.</label></div>
+        <div class="form-text mt-2">La contraseña se guarda cifrada con BCrypt y nunca se muestra en el sistema.</div>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button><button class="btn btn-danger">Restablecer contraseña</button></div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script><script src="/js/app.js"></script><script src="/js/usuarios.js"></script>
+</body>
+</html>
