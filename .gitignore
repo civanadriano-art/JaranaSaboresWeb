@@ -1,0 +1,8 @@
+/target/
+/.idea/
+/.vscode/
+/nbproject/private/
+*.iml
+*.log
+.env
+backups/*.sql

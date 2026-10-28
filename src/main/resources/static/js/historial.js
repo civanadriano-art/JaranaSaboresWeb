@@ -1,0 +1,3 @@
+async function cargar(){try{const xs=await api('/api/pedidos/eliminados/historial');tabla.innerHTML=`<table class="table table-hover table-app"><thead><tr><th>ID</th><th>Pedido</th><th>Cliente</th><th>Motivo</th><th>Fecha</th></tr></thead><tbody>${xs.map(x=>`<tr><td>${x.idEliminacion}</td><td><strong>#${x.pedido.numero}</strong></td><td>${escapeHtml(x.pedido.cliente.nombre)}</td><td>${escapeHtml(x.motivo)}</td><td>${fecha(x.fechaHoraEliminacion)}</td></tr>`).join('')}</tbody></table>`}catch(e){showError(e)}}
+async function restaurar(){try{const p=await api('/api/pedidos/restaurar-ultimo',{method:'POST'});showToast('Restaurado pedido #'+p.numero);cargar()}catch(e){showError(e)}}
+document.addEventListener('DOMContentLoaded',cargar);
