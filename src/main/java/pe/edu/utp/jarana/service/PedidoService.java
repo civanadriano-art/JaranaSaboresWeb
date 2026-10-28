@@ -160,8 +160,21 @@ public class PedidoService {
         PedidoEliminado eliminado = idEstructura == null
                 ? eliminadoRepository.findTopByOrderByIdEliminacionDesc().orElseThrow(() -> new ReglaNegocioException("No hay pedidos eliminados para restaurar"))
                 : eliminadoRepository.findById(idEstructura).orElseThrow(() -> new ReglaNegocioException("No se encontró el pedido eliminado"));
+        return restaurarEliminado(eliminado);
+    }
 
+    @Transactional
+    public PedidoResponse restaurarEliminado(Long idEliminacion) {
+        PedidoEliminado eliminado = eliminadoRepository.findById(idEliminacion)
+                .orElseThrow(() -> new ReglaNegocioException("No se encontró el registro eliminado #" + idEliminacion));
+        return restaurarEliminado(eliminado);
+    }
+
+    private PedidoResponse restaurarEliminado(PedidoEliminado eliminado) {
         Pedido pedido = eliminado.getPedido();
+        if (pagoRepository.existsByPedidoNumero(pedido.getNumero())) {
+            throw new ReglaNegocioException("No se puede restaurar un pedido que ya tiene un pago registrado");
+        }
         pedido.setEstado(EstadoPedido.PENDIENTE);
         pedido.setFechaHoraRegistro(LocalDateTime.now());
         pedido.setFechaHoraInicioPreparacion(null);
@@ -198,7 +211,8 @@ public class PedidoService {
         lista.paraCada(item -> {
             Plato plato = platoRepository.findById(item.getCodigoPlato())
                     .filter(Plato::isActivo)
-                    .orElseThrow(() -> new ReglaNegocioException("Plato no disponible: " + item.getCodigoPlato()));
+                    .filter(Plato::isDisponible)
+                    .orElseThrow(() -> new ReglaNegocioException("El plato seleccionado está agotado o no disponible"));
             if (item.getCantidad() <= 0) throw new ReglaNegocioException("La cantidad debe ser mayor que 0");
             DetallePedido detalle = new DetallePedido();
             detalle.setPlato(plato);
@@ -221,6 +235,7 @@ public class PedidoService {
                 d.getPlato().getCodigo(), d.getPlato().getNombre(), d.getCantidad(), d.getPrecioUnitario(), d.getObservacion(), d.getCostoExtra()
         )).toList();
         return new PedidoResponse(p.getNumero(), p.getCliente().getNombre(), p.getCliente().getTelefono(),
-                p.getEstado().getEtiqueta(), p.getFechaHoraRegistro(), calcularTotal(p), detalles);
+                p.getEstado().getEtiqueta(), p.getFechaHoraRegistro(), p.getFechaHoraInicioPreparacion(),
+                p.getFechaHoraListo(), calcularTotal(p), detalles);
     }
 }

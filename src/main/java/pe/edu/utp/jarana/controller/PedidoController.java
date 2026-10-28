@@ -77,5 +77,12 @@ public class PedidoController {
         return p;
     }
 
+    @PostMapping("/eliminados/{idEliminacion}/restaurar")
+    public PedidoResponse restaurarEliminado(@PathVariable Long idEliminacion, Principal principal) {
+        PedidoResponse p = service.restaurarEliminado(idEliminacion);
+        auditoria.registrar(principal.getName(), "RESTAURAR_PEDIDO", "PEDIDO", String.valueOf(p.numero()), "Se restauró el pedido eliminado #" + p.numero());
+        return p;
+    }
+
     @GetMapping("/eliminados/historial") public List<PedidoEliminado> eliminados() { return service.listarEliminados(); }
 }

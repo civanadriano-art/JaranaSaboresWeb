@@ -10,6 +10,8 @@ public record PedidoResponse(
         String telefono,
         String estado,
         LocalDateTime fechaRegistro,
+        LocalDateTime fechaInicioPreparacion,
+        LocalDateTime fechaListo,
         BigDecimal total,
         List<DetalleResponse> detalles) {
 

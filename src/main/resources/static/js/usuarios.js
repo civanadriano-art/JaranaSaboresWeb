@@ -97,7 +97,8 @@ passwordForm.addEventListener('submit',async e=>{
 
 async function desbloquear(id){
   const u=USUARIOS.find(x=>x.idUsuario===id);if(!u)return;
-  if(!confirm(`¿Desbloquear la cuenta ${u.nombreUsuario}?`))return;
+  const ok=await appConfirm({title:`Desbloquear ${u.nombreUsuario}`,message:'Se restablecerán los intentos fallidos y la cuenta podrá iniciar sesión nuevamente.',confirmText:'Desbloquear cuenta',tone:'success',icon:'✓'});
+  if(!ok)return;
   try{await api(`/api/usuarios/${id}/desbloquear`,{method:'POST'});showToast('Usuario desbloqueado');await cargarUsuarios()}catch(e){showError(e)}
 }
 
@@ -105,7 +106,8 @@ async function cambiarEstado(id,activo){
   const u=USUARIOS.find(x=>x.idUsuario===id);if(!u)return;
   if(esActual(u) && !activo){showToast('No puedes desactivar tu propia cuenta','error');return}
   const accion=activo?'activar':'desactivar';
-  if(!confirm(`¿Seguro que deseas ${accion} la cuenta ${u.nombreUsuario}?`))return;
+  const ok=await appConfirm({title:`${activo?'Activar':'Desactivar'} cuenta`,message:`${activo?'La cuenta podrá volver a ingresar al sistema.':'La cuenta dejará de poder iniciar sesión.'}`,note:`Usuario: ${u.nombreUsuario}`,confirmText:activo?'Activar cuenta':'Desactivar cuenta',tone:activo?'success':'danger',icon:activo?'✓':'!'});
+  if(!ok)return;
   try{await api(`/api/usuarios/${id}/estado`,{method:'POST',body:JSON.stringify({activo})});showToast(activo?'Usuario activado':'Usuario desactivado');await cargarUsuarios()}catch(e){showError(e)}
 }
 

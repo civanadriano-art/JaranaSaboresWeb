@@ -1,5 +1,170 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Panel de cocina | La Jarana de Sabores</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="/css/app.css"></head><body><div class="app-shell">
-<header class="topbar"><button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button><a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a><div class="user-chip"><div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div><div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a></div></header>
-<aside class="sidebar"><div class="sidebar-section">Operación</div><a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Inicio</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a><a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a><div class="sidebar-section">Administración</div><a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/usuarios.html"><span class="nav-icon">♙</span>Usuarios</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a></aside>
-<main class="main"><div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4"><div><h1 class="page-title">Panel de cocina</h1><p class="page-subtitle">Atiende los pedidos en orden de llegada.</p></div></div>
-<div class="row g-4"><div class="col-lg-4"><div class="kanban-col"><div class="kanban-title"><span>Pendientes</span><span id="countPend" class="badge text-bg-warning">0</span></div><div id="colPend"></div></div></div><div class="col-lg-4"><div class="kanban-col"><div class="kanban-title"><span>En preparación</span><span id="countPrep" class="badge text-bg-info">0</span></div><div id="colPrep"></div></div></div><div class="col-lg-4"><div class="kanban-col"><div class="kanban-title"><span>Listos</span><span id="countListo" class="badge text-bg-success">0</span></div><div id="colListo"></div></div></div></div></main></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="/js/api.js"></script><script src="/js/app.js"></script><script src="/js/cocina.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Panel de cocina | La Jarana de Sabores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button>
+    <a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a>
+    <div class="user-chip">
+      <div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div>
+      <div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">Operación</div>
+    <a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Inicio</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a>
+    <a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a>
+    <div class="sidebar-section" data-role="ADMINISTRADOR">Administración</div>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/usuarios.html"><span class="nav-icon">♙</span>Usuarios</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a>
+  </aside>
+
+  <main class="main kitchen-page">
+    <div class="kitchen-hero mb-4">
+      <div>
+        <div class="dashboard-eyebrow">Operación de cocina</div>
+        <h1 class="page-title">Panel de cocina</h1>
+        <p class="page-subtitle mb-0">Prioriza pedidos por orden de llegada y controla el tiempo de preparación.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="kitchen-live"><span></span> Actualización automática</span>
+        <button class="btn btn-outline-danger btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#dishAvailabilityModal" onclick="cargarDisponibilidadPlatos()">☷ Disponibilidad de platos</button>
+        <button class="btn btn-outline-dark btn-sm" type="button" onclick="cargarCocina(true)">↻ Actualizar</button>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4" id="kitchenKpis">
+      <div class="col-12"><div class="section-card p-4 text-muted">Cargando cocina...</div></div>
+    </div>
+
+    <section class="section-card p-3 p-lg-4 mb-4 kitchen-toolbar">
+      <div class="row g-3 align-items-end">
+        <div class="col-lg-6">
+          <label class="form-label">Buscar pedido</label>
+          <div class="input-group kitchen-search-group">
+            <span class="input-group-text">⌕</span>
+            <input id="kitchenSearch" class="form-control" placeholder="Ticket, cliente, plato u observación...">
+          </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <label class="form-label">Vista</label>
+          <select id="kitchenView" class="form-select">
+            <option value="TODOS">Todos</option>
+            <option value="PENDIENTE">Pendientes</option>
+            <option value="EN_PREPARACION">En preparación</option>
+            <option value="LISTO">Listos</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+          <div class="kitchen-updated-box">
+            <span>Última actualización</span>
+            <strong id="kitchenUpdated">—</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="row g-4 kitchen-board">
+      <div class="col-xl-4 kitchen-column-wrap" data-column="PENDIENTE">
+        <section class="kanban-col kitchen-kanban pending-col">
+          <div class="kanban-title">
+            <div><span class="kitchen-column-icon">⌛</span><span>Pendientes</span></div>
+            <span id="countPend" class="badge text-bg-warning">0</span>
+          </div>
+          <div class="kitchen-column-help">Pedidos que todavía no iniciaron preparación.</div>
+          <div id="colPend" class="kitchen-card-list"></div>
+        </section>
+      </div>
+      <div class="col-xl-4 kitchen-column-wrap" data-column="EN_PREPARACION">
+        <section class="kanban-col kitchen-kanban prep-col">
+          <div class="kanban-title">
+            <div><span class="kitchen-column-icon">♨</span><span>En preparación</span></div>
+            <span id="countPrep" class="badge text-bg-info">0</span>
+          </div>
+          <div class="kitchen-column-help">Pedidos que se están preparando ahora.</div>
+          <div id="colPrep" class="kitchen-card-list"></div>
+        </section>
+      </div>
+      <div class="col-xl-4 kitchen-column-wrap" data-column="LISTO">
+        <section class="kanban-col kitchen-kanban ready-col">
+          <div class="kanban-title">
+            <div><span class="kitchen-column-icon">✓</span><span>Listos</span></div>
+            <span id="countListo" class="badge text-bg-success">0</span>
+          </div>
+          <div class="kitchen-column-help">Pedidos terminados y esperando retiro de caja.</div>
+          <div id="colListo" class="kitchen-card-list"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal fade" id="dishAvailabilityModal" tabindex="-1" aria-labelledby="dishAvailabilityTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+    <div class="modal-content border-0 availability-modal">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title" id="dishAvailabilityTitle">Disponibilidad de platos</h5>
+          <div class="small text-muted">Marca un plato como agotado para impedir nuevos pedidos desde Caja.</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3 mb-3">
+          <div class="col-6">
+            <div class="availability-summary available"><span>Disponibles</span><strong id="dishAvailableCount">0</strong></div>
+          </div>
+          <div class="col-6">
+            <div class="availability-summary soldout"><span>Agotados</span><strong id="dishSoldOutCount">0</strong></div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text">⌕</span>
+          <input id="dishAvailabilitySearch" class="form-control" placeholder="Buscar plato o categoría...">
+        </div>
+        <div id="dishAvailabilityList"><div class="text-muted py-4 text-center">Cargando platos...</div></div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <small class="text-muted">Los cambios se reflejan automáticamente en el registro de pedidos.</small>
+        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="dishConfirmModal" tabindex="-1" aria-labelledby="dishConfirmTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content border-0 dish-confirm-modal">
+      <div class="modal-body p-4 text-center">
+        <div id="dishConfirmIcon" class="dish-confirm-icon soldout">!</div>
+        <h5 class="fw-bold mb-2" id="dishConfirmTitle">Cambiar disponibilidad</h5>
+        <p class="text-muted mb-2" id="dishConfirmMessage"></p>
+        <div class="dish-confirm-note" id="dishConfirmNote"></div>
+      </div>
+      <div class="modal-footer border-0 pt-0 px-4 pb-4 gap-2">
+        <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger flex-fill" id="dishConfirmAction">Marcar agotado</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/cocina.js"></script>
+</body>
+</html>

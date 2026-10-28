@@ -34,7 +34,7 @@ async function crearBackup(){
 
 async function restaurarUltimoBackup(){
   if(!BACKUP_DISPONIBLE)return;
-  const ok=confirm('Se restaurará la última copia de seguridad y los datos actuales volverán al estado guardado. Antes de restaurar se creará automáticamente una copia preventiva. ¿Deseas continuar?');
+  const ok=await appConfirm({title:'Restaurar última copia de seguridad',message:'Los datos actuales volverán al estado guardado en el último backup.',note:'Antes de restaurar se creará automáticamente una copia preventiva de la base actual.',confirmText:'Restaurar backup',tone:'warning',icon:'↶'});
   if(!ok)return;
   const btn=document.getElementById('btnRestaurar');
   const original=btn.innerHTML;

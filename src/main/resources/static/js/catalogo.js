@@ -140,7 +140,8 @@ async function cambiarDisponibilidad(codigo, disponible) {
 async function retirarPlato(codigo) {
   const p = platos.find(x => x.codigo === codigo);
   if (!p) return;
-  if (!confirm(`¿Retirar “${p.nombre}” del catálogo?\n\nYa no aparecerá para registrar nuevos pedidos.`)) return;
+  const ok=await appConfirm({title:`Retirar ${p.nombre} del catálogo`,message:'El plato dejará de aparecer para registrar nuevos pedidos.',note:'Esta acción no modifica pedidos ya registrados.',confirmText:'Retirar del catálogo',tone:'danger',icon:'×'});
+  if(!ok)return;
   try {
     await api(`/api/platos/${codigo}`, { method: 'DELETE' });
     showToast('Plato retirado del catálogo');

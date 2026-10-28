@@ -1,5 +1,69 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pedidos eliminados | La Jarana de Sabores</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="/css/app.css"></head><body><div class="app-shell">
-<header class="topbar"><button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button><a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a><div class="user-chip"><div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div><div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a></div></header>
-<aside class="sidebar"><div class="sidebar-section">Operación</div><a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Inicio</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a><a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a><div class="sidebar-section">Administración</div><a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/usuarios.html"><span class="nav-icon">♙</span>Usuarios</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a></aside>
-<main class="main"><div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4"><div><h1 class="page-title">Pedidos eliminados</h1><p class="page-subtitle">Consulta cancelaciones y restaura el último pedido eliminado.</p></div></div>
-<section class="section-card overflow-hidden"><div class="p-4 border-bottom d-flex justify-content-between align-items-center"><div><h5 class="fw-bold mb-1">Historial de cancelaciones</h5><small class="text-muted">Se conserva el motivo y la fecha de eliminación.</small></div><button onclick="restaurar()" class="btn btn-outline-danger">↶ Restaurar último</button></div><div id="tabla" class="table-responsive"></div></section></main></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="/js/api.js"></script><script src="/js/app.js"></script><script src="/js/historial.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pedidos eliminados | La Jarana de Sabores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button>
+    <a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a>
+    <div class="user-chip">
+      <div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div>
+      <div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a>
+    </div>
+  </header>
+  <aside class="sidebar">
+    <div class="sidebar-section">Operación</div>
+    <a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Inicio</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a>
+    <a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a>
+    <div class="sidebar-section" data-role="ADMINISTRADOR">Administración</div>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/usuarios.html"><span class="nav-icon">♙</span>Usuarios</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a>
+  </aside>
+
+  <main class="main history-page">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+      <div><h1 class="page-title">Pedidos eliminados</h1><p class="page-subtitle">Consulta cancelaciones y recupera pedidos cuando sea necesario.</p></div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-4"><div class="kpi-card"><div class="kpi-head"><div><div class="kpi-label">Total eliminados</div><div class="kpi-value" id="kpiTotal">0</div></div><div class="kpi-icon">↶</div></div></div></div>
+      <div class="col-12 col-md-4"><div class="kpi-card"><div class="kpi-head"><div><div class="kpi-label">Eliminados hoy</div><div class="kpi-value" id="kpiHoy">0</div></div><div class="kpi-icon">◷</div></div></div></div>
+      <div class="col-12 col-md-4"><div class="kpi-card"><div class="kpi-head"><div><div class="kpi-label">Restaurables</div><div class="kpi-value" id="kpiRestaurables">0</div></div><div class="kpi-icon">✓</div></div></div></div>
+    </div>
+
+    <section class="section-card mb-4">
+      <div class="p-4">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-5">
+            <label class="form-label">Buscar</label>
+            <div class="input-group history-search-group"><span class="input-group-text">⌕</span><input id="buscarHistorial" class="form-control" placeholder="Pedido, cliente, motivo o usuario"></div>
+          </div>
+          <div class="col-12 col-sm-6 col-lg-2"><label class="form-label">Desde</label><input id="desdeHistorial" type="date" class="form-control"></div>
+          <div class="col-12 col-sm-6 col-lg-2"><label class="form-label">Hasta</label><input id="hastaHistorial" type="date" class="form-control"></div>
+          <div class="col-12 col-lg-3 d-flex gap-2"><button id="btnFiltrarHistorial" class="btn btn-jarana flex-fill">Aplicar filtro</button><button id="btnLimpiarHistorial" class="btn btn-outline-secondary">Limpiar</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card overflow-hidden">
+      <div class="p-4 border-bottom"><h5 class="fw-bold mb-1">Historial de cancelaciones</h5><small class="text-muted">Cada pedido puede restaurarse de manera individual.</small></div>
+      <div id="tabla" class="table-responsive"></div>
+    </section>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script><script src="/js/app.js"></script><script src="/js/historial.js"></script>
+</body>
+</html>

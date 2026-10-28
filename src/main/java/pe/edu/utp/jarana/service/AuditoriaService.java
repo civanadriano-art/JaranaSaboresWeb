@@ -1,6 +1,9 @@
 package pe.edu.utp.jarana.service;
 
 import java.util.List;
+import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import pe.edu.utp.jarana.model.EventoAuditoria;
 import pe.edu.utp.jarana.model.Usuario;
@@ -20,4 +23,13 @@ public class AuditoriaService {
         repo.save(e);
     }
     public List<EventoAuditoria> listar() { return repo.findTop100ByOrderByFechaEventoDesc(); }
+
+    public Map<String, Long> resumen() {
+        LocalDateTime inicio = LocalDate.now().atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        return Map.of(
+                "totalEventos", repo.count(),
+                "eventosHoy", repo.countByFechaEventoGreaterThanEqualAndFechaEventoLessThan(inicio, fin),
+                "usuariosConActividad", repo.contarUsuariosConActividad());
+    }
 }

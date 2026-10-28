@@ -179,3 +179,25 @@ La pantalla de administración de usuarios incorpora búsqueda por nombre/usuari
 
 ## Catálogo mejorado
 La pantalla de catálogo incluye indicadores de total, disponibles y agotados; búsqueda por nombre/código; filtros por categoría y disponibilidad; alta/edición en modal; y cambio rápido entre disponible y agotado. No se muestra una columna ni filtro de estado.
+
+### Historial y actividad administrativa
+
+La pantalla **Historial** permite buscar y filtrar pedidos cancelados y restaurar un pedido específico al estado Pendiente. La restauración individual está restringida al rol Administrador y queda registrada en auditoría.
+
+La pantalla **Actividad** presenta las 100 acciones más recientes con nombres amigables, filtros por usuario/acción/fecha, indicadores generales, detalle de cada evento y paginación de 20 registros por página.
+
+## Panel por rol y navegación segura
+
+El panel principal adapta sus indicadores y prioridades al rol autenticado (Caja, Cocina o Administrador). Los elementos con `data-role` permanecen ocultos hasta que `/api/auth/me` confirma la sesión, evitando el parpadeo visual de opciones no autorizadas. Spring Security también restringe directamente las páginas de cada rol.
+
+
+### Disponibilidad de platos desde Cocina
+El rol COCINERO puede marcar platos como **Agotados** o **Disponibles** desde el Panel de cocina. Los platos agotados dejan de estar disponibles para nuevos pedidos de Caja y el backend también rechaza su registro aunque el formulario del cajero estuviera abierto previamente.
+
+
+## Cuadros de confirmación del sistema
+
+Las acciones sensibles ya no utilizan `alert()`, `confirm()` ni `prompt()` del navegador. Catálogo, Historial, Usuarios, Cobros, Backup y Pedidos usan modales propios con el diseño de La Jarana de Sabores. El motivo de cancelación de pedidos se captura también dentro de un modal del sistema.
+
+## Atención prioritaria de Caja
+El Inicio del rol CAJERO incluye un bloque de atención prioritaria para pedidos en estado LISTO. Los pedidos listos sin pago se muestran primero con acceso directo a Cobros. Los pedidos ya pagados aparecen después con acción directa de despacho. El tiempo de espera se resalta visualmente a partir de 10 y 20 minutos.
