@@ -17,7 +17,6 @@ import pe.edu.utp.jarana.repository.*;
 
 @Service
 public class PedidoService {
-    private static final int LIMITE_PENDIENTES = 50;
     private static final int LIMITE_ELIMINADOS = 50;
 
     private final PedidoRepository pedidoRepository;
@@ -61,12 +60,12 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponse registrar(CrearPedidoRequest req) {
-        long activos = pedidoRepository.countByEstadoIn(List.of(EstadoPedido.PENDIENTE, EstadoPedido.EN_PREPARACION, EstadoPedido.LISTO));
-        if (activos >= LIMITE_PENDIENTES) throw new ReglaNegocioException("Se alcanzó el límite de 50 pedidos pendientes");
-
-        Cliente cliente = clienteRepository.findFirstByTelefono(req.getTelefono()).orElseGet(Cliente::new);
+        String telefono = normalizarTelefono(req.getTelefono());
+        Cliente cliente = telefono == null
+                ? new Cliente()
+                : clienteRepository.findFirstByTelefono(telefono).orElseGet(Cliente::new);
         cliente.setNombre(req.getNombreCliente().trim());
-        cliente.setTelefono(req.getTelefono());
+        cliente.setTelefono(telefono);
         cliente = clienteRepository.save(cliente);
 
         Pedido pedido = new Pedido();
@@ -85,7 +84,7 @@ public class PedidoService {
         exigirEstado(pedido, EstadoPedido.PENDIENTE, "Solo se puede editar un pedido Pendiente");
         if (pagoRepository.existsByPedidoNumero(numero)) throw new ReglaNegocioException("Un pedido pagado ya no puede modificarse");
         pedido.getCliente().setNombre(req.getNombreCliente().trim());
-        pedido.getCliente().setTelefono(req.getTelefono());
+        pedido.getCliente().setTelefono(normalizarTelefono(req.getTelefono()));
         clienteRepository.save(pedido.getCliente());
         pedido.limpiarDetalles();
         cargarDetalles(pedido, req.getDetalles());
@@ -152,9 +151,6 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponse restaurarUltimo() {
-        if (pedidoRepository.countByEstadoIn(List.of(EstadoPedido.PENDIENTE, EstadoPedido.EN_PREPARACION, EstadoPedido.LISTO)) >= LIMITE_PENDIENTES)
-            throw new ReglaNegocioException("No hay espacio para restaurar: existen 50 pedidos activos");
-
         Long idEstructura = estructuras.ultimoEliminado();
         PedidoEliminado eliminado = idEstructura == null
                 ? eliminadoRepository.findTopByOrderByIdEliminacionDesc().orElseThrow(() -> new ReglaNegocioException("No hay pedidos eliminados para restaurar"))
@@ -174,6 +170,12 @@ public class PedidoService {
     }
 
     public List<PedidoEliminado> listarEliminados() { return eliminadoRepository.findAllByOrderByIdEliminacionDesc(); }
+
+    private String normalizarTelefono(String telefono) {
+        if (telefono == null) return null;
+        String limpio = telefono.trim();
+        return limpio.isEmpty() ? null : limpio;
+    }
 
     private Pedido buscarPedido(Integer numero) {
         return pedidoRepository.findById(numero).orElseThrow(() -> new ReglaNegocioException("Pedido #" + numero + " no encontrado"));

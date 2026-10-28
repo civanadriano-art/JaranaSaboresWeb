@@ -23,6 +23,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/pedidos/**").hasAnyRole("CAJERO", "ADMINISTRADOR")
                 .requestMatchers("/api/pagos/**").hasAnyRole("CAJERO", "ADMINISTRADOR")
                 .requestMatchers("/api/auditoria/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/api/backups/**").hasRole("ADMINISTRADOR")
+                .requestMatchers("/backup.html").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.POST, "/api/platos/**").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.PUT, "/api/platos/**").hasRole("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.DELETE, "/api/platos/**").hasRole("ADMINISTRADOR")

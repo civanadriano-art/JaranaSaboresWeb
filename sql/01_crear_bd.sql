@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE TABLE IF NOT EXISTS clientes (
   id_cliente INT AUTO_INCREMENT PRIMARY KEY,
   nombre VARCHAR(100) NOT NULL,
-  telefono VARCHAR(9) NOT NULL,
+  telefono VARCHAR(9) NULL,
   fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_cliente_telefono (telefono)
 );

@@ -14,7 +14,7 @@ public class Cliente {
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column(nullable = false, length = 9)
+    @Column(nullable = true, length = 9)
     private String telefono;
 
     @Column(name = "fecha_registro", nullable = false)

@@ -11,8 +11,7 @@ public class CrearPedidoRequest {
     @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñÜü ]{2,100}$", message = "El nombre solo debe contener letras y espacios")
     private String nombreCliente;
 
-    @NotBlank
-    @Pattern(regexp = "^[0-9]{7,9}$", message = "El teléfono debe tener entre 7 y 9 dígitos")
+    @Pattern(regexp = "^$|^[0-9]{7,9}$", message = "Si ingresas un teléfono, debe tener entre 7 y 9 dígitos")
     private String telefono;
 
     @NotEmpty

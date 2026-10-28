@@ -137,3 +137,13 @@ La aplicación incluye `server.address=0.0.0.0`, por lo que Spring Boot puede ac
 MySQL sigue siendo local en la PC servidor y usa el puerto 3307; las tablets y celulares NO se conectan directamente a MySQL. Se conectan a Spring Boot.
 
 La interfaz ya incluye viewport, rejillas Bootstrap, tablas desplazables, menú lateral móvil y controles táctiles adaptados para pantallas pequeñas.
+
+
+## Backup desde el panel web
+
+El administrador puede crear una copia de seguridad y restaurar la última copia desde `backup.html`. El backend utiliza `mysqldump` y `mysql`. En Windows intenta detectar automáticamente las herramientas instaladas de MySQL; también se pueden definir `MYSQLDUMP_PATH` y `MYSQL_PATH`. Los archivos `.sql` se guardan en la carpeta `backups/`, excluida de Git.
+
+## Ajustes recientes
+- El teléfono del cliente es opcional. Si se ingresa, debe contener entre 7 y 9 dígitos.
+- Los pedidos activos ya no tienen un límite fijo de 50.
+- Si la base ya existía, ejecutar `sql/04_telefono_opcional.sql`.

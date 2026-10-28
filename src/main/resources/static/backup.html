@@ -1,5 +1,78 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Copias de seguridad | La Jarana de Sabores</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="/css/app.css"></head><body><div class="app-shell">
-<header class="topbar"><button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button><a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a><div class="user-chip"><div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div><div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a></div></header>
-<aside class="sidebar"><div class="sidebar-section">Operación</div><a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Dashboard</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a><a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a><a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a><div class="sidebar-section">Administración</div><a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a><a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a></aside>
-<main class="main"><div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4"><div><h1 class="page-title">Copias de seguridad</h1><p class="page-subtitle">Respalda y restaura la base de datos MySQL.</p></div></div>
-<div class="row g-4"><div class="col-lg-6"><section class="section-card p-4 h-100"><div class="kpi-icon mb-3">⇩</div><h5 class="fw-bold">Crear backup</h5><p class="text-muted">El proyecto incluye un script de Windows para exportar <b>restaurante_db</b> mediante <code>mysqldump</code>.</p><div class="bg-dark text-light rounded-3 p-3 small"><code>scripts\backup_mysql.bat</code></div><p class="small text-muted mt-3 mb-0">Ejecuta el script desde Windows. La web no ejecuta comandos del sistema por seguridad.</p></section></div><div class="col-lg-6"><section class="section-card p-4 h-100"><div class="kpi-icon mb-3">↶</div><h5 class="fw-bold">Restaurar backup</h5><p class="text-muted">Utiliza el script de restauración incluido en la raíz del proyecto.</p><div class="bg-dark text-light rounded-3 p-3 small"><code>scripts\restaurar_mysql.bat</code></div><div class="alert alert-warning mt-3 mb-0 small">Antes de restaurar, crea una copia de la base actual para evitar pérdida accidental de información.</div></section></div></div></main></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="/js/api.js"></script><script src="/js/app.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Copias de seguridad | La Jarana de Sabores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <button class="btn btn-sm btn-outline-light sidebar-toggle me-2" onclick="toggleSidebar()">☰</button>
+    <a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a>
+    <div class="user-chip">
+      <div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div>
+      <div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a>
+    </div>
+  </header>
+
+  <aside class="sidebar">
+    <div class="sidebar-section">Operación</div>
+    <a class="nav-link-app" href="/dashboard.html"><span class="nav-icon">▦</span>Dashboard</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pedidos.html"><span class="nav-icon">＋</span>Pedidos</a>
+    <a class="nav-link-app" data-role="COCINERO,ADMINISTRADOR" href="/cocina.html"><span class="nav-icon">♨</span>Cocina</a>
+    <a class="nav-link-app" data-role="CAJERO,ADMINISTRADOR" href="/pagos.html"><span class="nav-icon">S/</span>Cobros</a>
+    <div class="sidebar-section">Administración</div>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/catalogo.html"><span class="nav-icon">☷</span>Catálogo</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/historial.html"><span class="nav-icon">↶</span>Historial</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/reportes.html"><span class="nav-icon">▥</span>Reportes</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/auditoria.html"><span class="nav-icon">◎</span>Actividad</a>
+    <a class="nav-link-app" data-role="ADMINISTRADOR" href="/backup.html"><span class="nav-icon">⇩</span>Backup</a>
+  </aside>
+
+  <main class="main">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+      <div><h1 class="page-title">Copias de seguridad</h1><p class="page-subtitle">Protege la información del restaurante y recupérala cuando sea necesario.</p></div>
+    </div>
+
+    <section class="section-card p-4 mb-4">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div>
+          <div class="small text-uppercase fw-bold text-muted mb-1">Última copia disponible</div>
+          <div id="backupArchivo" class="fw-bold fs-5">Consultando...</div>
+          <div id="backupDetalle" class="text-muted small mt-1">—</div>
+        </div>
+        <span class="badge text-bg-light border px-3 py-2">Base: restaurante_db</span>
+      </div>
+    </section>
+
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <section class="section-card p-4 h-100 d-flex flex-column">
+          <div class="kpi-icon mb-3">⇩</div>
+          <h5 class="fw-bold">Crear copia de seguridad</h5>
+          <p class="text-muted flex-grow-1">Guarda automáticamente una copia completa de la información actual de pedidos, usuarios, platos, pagos, ventas e historial.</p>
+          <button id="btnCrearBackup" class="btn btn-jarana btn-lg w-100" onclick="crearBackup()">Crear backup ahora</button>
+        </section>
+      </div>
+
+      <div class="col-lg-6">
+        <section class="section-card p-4 h-100 d-flex flex-column">
+          <div class="kpi-icon mb-3">↶</div>
+          <h5 class="fw-bold">Restaurar última copia</h5>
+          <p class="text-muted flex-grow-1">Recupera la información guardada en la última copia. Antes de restaurar, el sistema crea automáticamente un respaldo preventivo del estado actual.</p>
+          <button id="btnRestaurar" class="btn btn-outline-danger btn-lg w-100" onclick="restaurarUltimoBackup()" disabled>Restaurar último backup</button>
+          <div class="alert alert-warning mt-3 mb-0 small">La restauración reemplaza los datos actuales por los contenidos en la última copia seleccionada.</div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/backup.js"></script>
+</body>
+</html>
