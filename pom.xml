@@ -19,6 +19,10 @@
 
     <properties>
         <java.version>21</java.version>
+        <!-- Versiones de las librerías adicionales (un solo lugar para actualizarlas) -->
+        <poi.version>5.4.1</poi.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
+        <guava.version>33.4.8-jre</guava.version>
     </properties>
 
     <dependencies>
@@ -42,6 +46,24 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <!-- Apache POI: reportes empresariales en Excel (.xlsx) -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <!-- Apache Commons Lang: validaciones y utilidades de texto (StringUtils) -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <!-- Google Guava: colecciones y utilidades (Multiset, Stopwatch) -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

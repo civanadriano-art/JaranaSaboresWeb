@@ -1,6 +1,11 @@
 package pe.edu.utp.jarana.config;
 
 import java.math.BigDecimal;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,12 +19,26 @@ import pe.edu.utp.jarana.service.EstructurasDatosService;
 
 @Configuration
 public class DataInitializer {
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+
+    /**
+     * Cuentas de demostración de versiones anteriores del sistema. Ya no se crean; si una base de datos
+     * antigua todavía las tiene con su contraseña original, se desactivan al iniciar.
+     */
+    private static final Map<String, String> CUENTAS_DEMO_ANTIGUAS = Map.of(
+            "admin", "admin123",
+            "cajero", "cajero123",
+            "cocina", "cocina123");
+
     @Bean
-    CommandLineRunner datosIniciales(UsuarioRepository usuarios, PlatoRepository platos, PasswordEncoder encoder, EstructurasDatosService estructuras) {
+    CommandLineRunner datosIniciales(UsuarioRepository usuarios, PlatoRepository platos, PasswordEncoder encoder,
+                                     EstructurasDatosService estructuras,
+                                     @Value("${app.admin.usuario}") String adminUsuario,
+                                     @Value("${app.admin.nombre}") String adminNombre,
+                                     @Value("${app.admin.password}") String adminPassword) {
         return args -> {
-            crearUsuarioSiNoExiste(usuarios, encoder, "admin", "admin123", "Administrador General", RolUsuario.ADMINISTRADOR);
-            crearUsuarioSiNoExiste(usuarios, encoder, "cajero", "cajero123", "Personal de Caja", RolUsuario.CAJERO);
-            crearUsuarioSiNoExiste(usuarios, encoder, "cocina", "cocina123", "Personal de Cocina", RolUsuario.COCINERO);
+            crearAdministradorInicial(usuarios, encoder, adminUsuario, adminNombre, adminPassword);
+            desactivarCuentasDemoAntiguas(usuarios, encoder, adminUsuario);
 
             if (platos.count() == 0) {
                 crearPlato(platos, estructuras, "Pollo Broaster - Ala", "Broaster", "10.00");
@@ -36,22 +55,52 @@ public class DataInitializer {
         };
     }
 
-    private void crearUsuarioSiNoExiste(UsuarioRepository repo, PasswordEncoder encoder, String usuario, String clave, String nombre, RolUsuario rol) {
-        var existente = repo.findByNombreUsuarioIgnoreCase(usuario);
+    /** Crea el administrador inicial solo si no existe; nunca pisa la contraseña de una cuenta ya creada. */
+    private void crearAdministradorInicial(UsuarioRepository repo, PasswordEncoder encoder,
+                                           String usuario, String nombre, String clave) {
+        if (StringUtils.isBlank(usuario) || StringUtils.isBlank(clave)) {
+            log.warn("No se creó el administrador inicial: faltan app.admin.usuario o app.admin.password");
+            return;
+        }
+        String login = usuario.trim();
+        var existente = repo.findByNombreUsuarioIgnoreCase(login);
         if (existente.isPresent()) {
             Usuario u = existente.get();
-            if (u.getNombre() == null || u.getNombre().isBlank()) { u.setNombre(nombre); repo.save(u); }
+            if (StringUtils.isBlank(u.getNombre())) { u.setNombre(StringUtils.defaultIfBlank(nombre, login)); repo.save(u); }
             return;
         }
         Usuario u = new Usuario();
-        u.setNombreUsuario(usuario);
-        u.setNombre(nombre);
+        u.setNombreUsuario(login);
+        u.setNombre(StringUtils.defaultIfBlank(nombre, login));
         u.setPasswordHash(encoder.encode(clave));
         u.setPasswordSal("BCrypt");
-        u.setRol(rol);
+        u.setRol(RolUsuario.ADMINISTRADOR);
         u.setActivo(true);
         u.setDebeCambiarPassword(false);
         repo.save(u);
+        log.info("Cuenta de administrador inicial '{}' creada", login);
+    }
+
+    /**
+     * Desactiva (no borra, para conservar el historial) las antiguas cuentas de demostración que aún tengan su
+     * contraseña original. Si alguien ya cambió la contraseña, la cuenta se considera real y no se toca.
+     */
+    private void desactivarCuentasDemoAntiguas(UsuarioRepository repo, PasswordEncoder encoder, String adminUsuario) {
+        String admin = StringUtils.trimToEmpty(adminUsuario);
+        CUENTAS_DEMO_ANTIGUAS.forEach((usuario, claveOriginal) -> {
+            if (usuario.equalsIgnoreCase(admin)) return;
+            repo.findByNombreUsuarioIgnoreCase(usuario).ifPresent(u -> {
+                if (!u.isActivo() || !encoder.matches(claveOriginal, u.getPasswordHash())) return;
+                if (u.getRol() == RolUsuario.ADMINISTRADOR
+                        && repo.countByRolAndActivoTrue(RolUsuario.ADMINISTRADOR) <= 1) {
+                    log.warn("La cuenta de demostración '{}' sigue activa porque es el único administrador activo", usuario);
+                    return;
+                }
+                u.setActivo(false);
+                repo.save(u);
+                log.warn("Cuenta de demostración '{}' desactivada (conservaba su contraseña original)", usuario);
+            });
+        });
     }
 
     private void crearPlato(PlatoRepository repo, EstructurasDatosService estructuras, String nombre, String categoria, String precio) {

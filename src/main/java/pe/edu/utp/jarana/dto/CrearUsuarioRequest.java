@@ -20,6 +20,7 @@ public class CrearUsuarioRequest {
 
     @NotBlank
     @Size(min = 8, max = 72, message = "La contraseña debe tener al menos 8 caracteres")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).*$", message = "La contraseña debe combinar letras y números")
     private String passwordTemporal;
 
     public String getNombreUsuario() { return nombreUsuario; }

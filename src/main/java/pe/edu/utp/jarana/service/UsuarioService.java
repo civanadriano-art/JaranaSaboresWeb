@@ -2,6 +2,9 @@ package pe.edu.utp.jarana.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,7 @@ import pe.edu.utp.jarana.repository.UsuarioRepository;
 
 @Service
 public class UsuarioService {
+    private static final Logger log = LoggerFactory.getLogger(UsuarioService.class);
     private final UsuarioRepository usuarios;
     private final PasswordEncoder encoder;
 
@@ -46,7 +50,9 @@ public class UsuarioService {
         u.setIntentosFallidos(0);
         u.setBloqueadoHasta(null);
         u.setDebeCambiarPassword(true);
-        return UsuarioResponse.de(usuarios.save(u));
+        Usuario guardado = usuarios.save(u);
+        log.info("Usuario '{}' creado con rol {}", limpiar(login), req.getRol());
+        return UsuarioResponse.de(guardado);
     }
 
     @Transactional
@@ -64,7 +70,9 @@ public class UsuarioService {
             u.setIntentosFallidos(0);
             u.setBloqueadoHasta(null);
         }
-        return UsuarioResponse.de(usuarios.save(u));
+        Usuario guardado = usuarios.save(u);
+        log.info("Cuenta '{}' {} por '{}'", limpiar(u.getNombreUsuario()), activo ? "activada" : "desactivada", limpiar(usuarioActual));
+        return UsuarioResponse.de(guardado);
     }
 
     @Transactional
@@ -72,7 +80,9 @@ public class UsuarioService {
         Usuario u = buscar(id);
         u.setIntentosFallidos(0);
         u.setBloqueadoHasta(null);
-        return UsuarioResponse.de(usuarios.save(u));
+        Usuario guardado = usuarios.save(u);
+        log.info("Cuenta '{}' desbloqueada", limpiar(u.getNombreUsuario()));
+        return UsuarioResponse.de(guardado);
     }
 
     @Transactional
@@ -83,7 +93,9 @@ public class UsuarioService {
         u.setIntentosFallidos(0);
         u.setBloqueadoHasta(null);
         u.setDebeCambiarPassword(true);
-        return UsuarioResponse.de(usuarios.save(u));
+        Usuario guardado = usuarios.save(u);
+        log.info("Contraseña restablecida para '{}' (deberá cambiarla al ingresar)", limpiar(u.getNombreUsuario()));
+        return UsuarioResponse.de(guardado);
     }
 
     @Transactional
@@ -91,6 +103,7 @@ public class UsuarioService {
         Usuario u = usuarios.findByNombreUsuarioIgnoreCase(username)
                 .orElseThrow(() -> new ReglaNegocioException("Usuario no encontrado"));
         if (!encoder.matches(req.getPasswordActual(), u.getPasswordHash())) {
+            log.warn("Cambio de contraseña rechazado para '{}': la contraseña actual no coincide", limpiar(username));
             throw new ReglaNegocioException("La contraseña actual no es correcta");
         }
         if (encoder.matches(req.getPasswordNueva(), u.getPasswordHash())) {
@@ -102,11 +115,12 @@ public class UsuarioService {
         u.setIntentosFallidos(0);
         u.setBloqueadoHasta(null);
         usuarios.save(u);
+        log.info("'{}' cambió su contraseña", limpiar(username));
     }
 
     @Transactional
     public void registrarFalloLogin(String username) {
-        if (username == null || username.isBlank()) return;
+        if (StringUtils.isBlank(username)) return;
         usuarios.findByNombreUsuarioIgnoreCase(username).ifPresent(u -> {
             if (!u.isActivo()) return;
             if (u.getBloqueadoHasta() != null && u.getBloqueadoHasta().isAfter(LocalDateTime.now())) return;
@@ -114,6 +128,9 @@ public class UsuarioService {
             u.setIntentosFallidos(intentos);
             if (intentos >= 5) {
                 u.setBloqueadoHasta(LocalDateTime.now().plusMinutes(15));
+                log.warn("Cuenta '{}' bloqueada por 15 minutos tras {} intentos fallidos", limpiar(username), intentos);
+            } else {
+                log.warn("Intento de inicio de sesión fallido para '{}' ({} de 5)", limpiar(username), intentos);
             }
             usuarios.save(u);
         });
@@ -127,7 +144,13 @@ public class UsuarioService {
         u.setBloqueadoHasta(null);
         u.setUltimoAcceso(LocalDateTime.now());
         usuarios.save(u);
+        log.info("Inicio de sesión correcto: '{}'", limpiar(username));
         return u.isDebeCambiarPassword();
+    }
+
+    /** Evita que un nombre de usuario con saltos de línea falsifique entradas del log. */
+    private static String limpiar(String texto) {
+        return StringUtils.defaultString(StringUtils.replaceChars(texto, "\r\n", "__"));
     }
 
     private Usuario buscar(Integer id) {

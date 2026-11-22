@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.utp.jarana.dto.CrearPedidoRequest;
@@ -22,7 +23,7 @@ public class PedidoController {
 
     @GetMapping
     public List<PedidoResponse> listar(@RequestParam(required = false) String estado) {
-        return estado == null || estado.isBlank() ? service.listarActivos() : service.listarPorEstado(EstadoPedido.desdeEtiqueta(estado));
+        return StringUtils.isBlank(estado) ? service.listarActivos() : service.listarPorEstado(EstadoPedido.desdeEtiqueta(estado));
     }
 
     @GetMapping("/{numero}") public PedidoResponse obtener(@PathVariable Integer numero) { return service.obtener(numero); }

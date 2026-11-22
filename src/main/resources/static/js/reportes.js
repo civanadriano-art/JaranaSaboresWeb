@@ -113,26 +113,23 @@ function aplicarPeriodo(tipo,btn){
   cargarReporte();
 }
 
-function csvCampo(v){
-  const s=String(v??'').replace(/"/g,'""');
-  return `"${s}"`;
-}
-
-function exportarExcel(){
+async function exportarExcel(){
   if(!ventasActuales.length){showToast('No hay ventas para exportar','warning');return}
-  const filas=[['Pedido','Cliente','Despacho','Tiempo preparación','Método de pago','Total']];
-  ventasActuales.forEach(v=>filas.push([
-    `#${v.numero}`,
-    v.cliente,
-    fecha(v.fechaHoraDespacho),
-    v.minutosCocina?`${v.minutosCocina} min`:'—',
-    metodoBonito(v.metodoPago),
-    Number(v.total||0).toFixed(2)
-  ]));
-  const contenido='\uFEFF'+filas.map(f=>f.map(csvCampo).join(';')).join('\r\n');
-  const blob=new Blob([contenido],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`reporte_jarana_${fechaISO(new Date())}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  try{
+    const res=await fetch('/api/reportes/excel'+construirQuery());
+    if(res.status===401){location='/login.html';return}
+    if(!res.ok){
+      const texto=await res.text();let data={};
+      try{data=texto?JSON.parse(texto):{}}catch{data={detalle:texto}}
+      throw new Error(data.error||data.detalle||`HTTP ${res.status}`);
+    }
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=`reporte_jarana_${fechaISO(new Date())}.xlsx`;
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    showToast('Reporte Excel descargado');
+  }catch(e){showError(e)}
 }
 
 function exportarPDF(){

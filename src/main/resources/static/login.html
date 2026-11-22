@@ -1,4 +1,62 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Iniciar sesión | La Jarana de Sabores</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="/css/app.css"></head><body class="login-page">
 <div class="login-panel"><section class="login-visual"><div class="login-logo">JS</div><p class="text-uppercase small fw-bold opacity-75">Sistema de gestión de pedidos</p><h1>La Jarana<br>de Sabores</h1><p class="mt-4 fs-5 opacity-75">Gestiona pedidos, cocina, cobros, catálogo y reportes desde una sola plataforma.</p></section>
-<section class="login-form"><div><p class="text-jarana fw-bold mb-2">BIENVENIDO</p><h2 class="fw-bold mb-2">Iniciar sesión</h2><p class="text-muted mb-4">Ingresa con tu cuenta asignada.</p><div id="msg"></div><form method="post" action="/login"><div class="mb-3"><label class="form-label">Usuario</label><input class="form-control form-control-lg" name="username" autocomplete="username" required></div><div class="mb-3"><label class="form-label">Contraseña</label><input type="password" class="form-control form-control-lg" name="password" autocomplete="current-password" required></div><button class="btn btn-jarana btn-lg w-100">Ingresar al sistema</button></form><div class="demo-box mt-4"><b>Usuarios de demostración</b><br>admin / admin123 &nbsp; · &nbsp; cajero / cajero123 &nbsp; · &nbsp; cocina / cocina123</div></div></section></div>
-<script>const q=new URLSearchParams(location.search);if(q.has('error'))msg.innerHTML='<div class="alert alert-danger">Usuario o contraseña incorrectos.</div>';if(q.has('logout'))msg.innerHTML='<div class="alert alert-success">Sesión cerrada correctamente.</div>';</script></body></html>
+<section class="login-form"><div><p class="text-jarana fw-bold mb-2">BIENVENIDO</p><h2 class="fw-bold mb-2">Iniciar sesión</h2><p class="text-muted mb-4">Ingresa con tu cuenta asignada.</p>
+<div id="msg" role="alert" aria-live="polite"></div>
+<form id="formLogin" method="post" action="/login">
+<div class="mb-3"><label class="form-label" for="username">Usuario</label><input id="username" class="form-control form-control-lg" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required autofocus></div>
+<div class="mb-3"><label class="form-label" for="password">Contraseña</label><div class="input-group input-group-lg"><input id="password" type="password" class="form-control" name="password" autocomplete="current-password" required><button id="verClave" class="btn btn-outline-secondary" type="button" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button></div><div id="capsHint" class="caps-hint" role="status">⚠ Tienes activado Bloq Mayús.</div></div>
+<button id="btnIngresar" class="btn btn-jarana btn-lg w-100" type="submit">Ingresar al sistema</button></form>
+<p class="text-muted small mt-4 mb-0">¿No puedes ingresar? Pide a un administrador que revise tu cuenta.</p></div></section></div>
+<script>
+(function(){
+  const q=new URLSearchParams(location.search);
+  const msg=document.getElementById('msg'),form=document.getElementById('formLogin');
+  const user=document.getElementById('username'),pass=document.getElementById('password');
+  const ver=document.getElementById('verClave'),caps=document.getElementById('capsHint'),btn=document.getElementById('btnIngresar');
+
+  // Aviso según el motivo por el que se volvió a esta pantalla
+  const mensajes={
+    error:['danger','Usuario o contraseña incorrectos.'],
+    bloqueado:['warning','Tu cuenta está bloqueada temporalmente por varios intentos fallidos. Espera 15 minutos o pide a un administrador que la desbloquee.'],
+    inactivo:['warning','Tu cuenta no está disponible. Consulta con un administrador.'],
+    logout:['success','Sesión cerrada correctamente.']
+  };
+  for(const clave in mensajes){
+    if(q.has(clave)){
+      const aviso=document.createElement('div');
+      aviso.className='alert alert-'+mensajes[clave][0];
+      aviso.textContent=mensajes[clave][1];
+      msg.replaceChildren(aviso);
+      break;
+    }
+  }
+
+  // Tras un intento fallido se devuelve el usuario escrito y se enfoca la contraseña
+  let previo=null;
+  try{previo=sessionStorage.getItem('ultimoUsuario');sessionStorage.removeItem('ultimoUsuario')}catch(e){}
+  if(previo&&(q.has('error')||q.has('bloqueado')||q.has('inactivo'))){user.value=previo;pass.focus()}
+
+  // Mostrar / ocultar contraseña
+  ver.addEventListener('click',()=>{
+    const mostrar=pass.type==='password';
+    pass.type=mostrar?'text':'password';
+    ver.textContent=mostrar?'Ocultar':'Mostrar';
+    ver.setAttribute('aria-pressed',String(mostrar));
+    ver.setAttribute('aria-label',mostrar?'Ocultar contraseña':'Mostrar contraseña');
+    pass.focus();
+  });
+
+  // Aviso de Bloq Mayús
+  function revisarCaps(e){if(e.getModifierState)caps.classList.toggle('show',e.getModifierState('CapsLock'))}
+  pass.addEventListener('keydown',revisarCaps);
+  pass.addEventListener('keyup',revisarCaps);
+  pass.addEventListener('blur',()=>caps.classList.remove('show'));
+
+  // Evita enviar dos veces el formulario
+  form.addEventListener('submit',()=>{
+    try{sessionStorage.setItem('ultimoUsuario',user.value.trim())}catch(e){}
+    btn.disabled=true;btn.textContent='Ingresando…';
+  });
+  window.addEventListener('pageshow',()=>{btn.disabled=false;btn.textContent='Ingresar al sistema'});
+})();
+</script></body></html>

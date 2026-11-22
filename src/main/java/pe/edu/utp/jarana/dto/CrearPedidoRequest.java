@@ -1,5 +1,6 @@
 package pe.edu.utp.jarana.dto;
 
+import jakarta.validation.constraints.Size;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -15,6 +16,7 @@ public class CrearPedidoRequest {
     private String telefono;
 
     @NotEmpty
+    @Size(max = 50, message = "Un pedido admite como máximo 50 líneas")
     @Valid
     private List<DetallePedidoRequest> detalles;
 

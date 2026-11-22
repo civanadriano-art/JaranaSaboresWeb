@@ -17,12 +17,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import pe.edu.utp.jarana.exception.ReglaNegocioException;
 
 @Service
 public class BackupService {
+    private static final Logger log = LoggerFactory.getLogger(BackupService.class);
 
     private final EstructurasDatosService estructuras;
 
@@ -104,6 +107,7 @@ public class BackupService {
 
     public Map<String, Object> crearBackup() {
         Path archivo = crearBackupInterno("backup");
+        log.info("Copia de seguridad creada: {}", archivo.getFileName());
         Map<String, Object> r = new LinkedHashMap<>();
         r.put("mensaje", "Copia de seguridad creada correctamente");
         r.putAll(infoArchivo(archivo));
@@ -120,6 +124,7 @@ public class BackupService {
         Path preventivo = crearBackupInterno("pre_restauracion");
         restaurar(objetivo);
         estructuras.cargarDesdeBaseDatos();
+        log.warn("Base de datos restaurada desde {} (copia preventiva: {})", objetivo.getFileName(), preventivo.getFileName());
 
         Map<String, Object> r = new LinkedHashMap<>();
         r.put("mensaje", "Base de datos restaurada correctamente");
@@ -163,6 +168,7 @@ public class BackupService {
         if (codigo != 0) {
             String detalle = leerError(error);
             borrarSilencioso(salida);
+            log.error("Falló mysqldump (código {}): {}", codigo, detalle);
             throw new ReglaNegocioException("No se pudo crear el backup" + (detalle.isBlank() ? "" : ": " + detalle));
         }
 
@@ -200,6 +206,7 @@ public class BackupService {
         int codigo = ejecutar(pb, "restaurar el backup");
         if (codigo != 0) {
             String detalle = leerError(error);
+            log.error("Falló la restauración con mysql (código {}): {}", codigo, detalle);
             throw new ReglaNegocioException("No se pudo restaurar el backup" + (detalle.isBlank() ? "" : ": " + detalle));
         }
         borrarSilencioso(error);

@@ -1,6 +1,8 @@
 package pe.edu.utp.jarana.service;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.utp.jarana.dto.PlatoRequest;
@@ -10,6 +12,7 @@ import pe.edu.utp.jarana.repository.PlatoRepository;
 
 @Service
 public class PlatoService {
+    private static final Logger log = LoggerFactory.getLogger(PlatoService.class);
     private final PlatoRepository platoRepository;
     private final EstructurasDatosService estructuras;
 
@@ -35,6 +38,7 @@ public class PlatoService {
         p.setActivo(true);
         p = platoRepository.save(p);
         estructuras.registrarPlato(p);
+        log.info("Plato #{} '{}' creado en el catálogo", p.getCodigo(), p.getNombre());
         return p;
     }
 
@@ -48,6 +52,7 @@ public class PlatoService {
         aplicar(req, p);
         p = platoRepository.save(p);
         estructuras.registrarPlato(p);
+        log.info("Plato #{} '{}' modificado", p.getCodigo(), p.getNombre());
         return p;
     }
 
@@ -58,6 +63,7 @@ public class PlatoService {
         p.setDisponible(disponible);
         p = platoRepository.save(p);
         estructuras.registrarPlato(p);
+        log.info("Plato #{} '{}' marcado como {}", p.getCodigo(), p.getNombre(), disponible ? "disponible" : "agotado");
         return p;
     }
 
@@ -67,6 +73,7 @@ public class PlatoService {
         estructuras.retirarPlato(p);
         p.setActivo(false);
         platoRepository.save(p);
+        log.info("Plato #{} '{}' desactivado del catálogo", p.getCodigo(), p.getNombre());
     }
 
     private void aplicar(PlatoRequest req, Plato p) {

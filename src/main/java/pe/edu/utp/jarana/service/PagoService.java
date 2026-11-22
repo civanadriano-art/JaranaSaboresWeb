@@ -2,6 +2,8 @@ package pe.edu.utp.jarana.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.utp.jarana.dto.PagoRequest;
@@ -11,6 +13,7 @@ import pe.edu.utp.jarana.repository.*;
 
 @Service
 public class PagoService {
+    private static final Logger log = LoggerFactory.getLogger(PagoService.class);
     private final PagoRepository pagos;
     private final PedidoRepository pedidos;
     private final UsuarioRepository usuarios;
@@ -43,6 +46,7 @@ public class PagoService {
         p.setVuelto(vuelto); p.setOperador(operador);
         p = pagos.save(p);
         auditoria.registrar(username, "REGISTRAR_PAGO", "PEDIDO", String.valueOf(numero), "Pago " + req.getMetodo() + " por S/ " + total);
+        log.info("Pago {} registrado para el pedido #{} por S/ {} (operador: {})", req.getMetodo(), numero, total, username);
         return p;
     }
 

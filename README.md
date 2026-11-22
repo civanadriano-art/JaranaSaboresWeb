@@ -74,11 +74,16 @@ mvn spring-boot:run
 
 http://localhost:8081/login.html
 
-Usuarios de demostración (Spring Boot los crea con BCrypt):
+### Cuenta de administrador inicial
 
-- admin / admin123
-- cajero / cajero123
-- cocina / cocina123
+Al iniciar por primera vez, Spring Boot crea una cuenta de administrador (la contraseña se guarda cifrada con BCrypt):
+
+- **Usuario:** `Esperanza`
+- **Contraseña:** la definida en `app.admin.password` de `application.properties`
+
+El sistema ya no crea cuentas de demostración. Si una base de datos antigua conserva `admin`, `cajero` o `cocina` con sus contraseñas originales, se desactivan automáticamente al iniciar (no se borran, para conservar el historial). Una cuenta con contraseña propia nunca se toca.
+
+Desde **Usuarios** el administrador crea las cuentas del personal (cajeros y cocineros). Las contraseñas deben tener mínimo 8 caracteres y combinar letras y números, y una cuenta con contraseña temporal solo puede usar el sistema después de cambiarla. Recomendado: cambiar la contraseña inicial y, para no dejarla escrita en el código, definirla con las variables de entorno `ADMIN_USER`, `ADMIN_NOMBRE` y `ADMIN_PASSWORD` antes de iniciar.
 
 ## Roles
 
@@ -168,7 +173,24 @@ El administrador dispone de `/usuarios.html` para crear, activar/desactivar, des
 Consulta `PRUEBAS_FUNCIONALES.md` para validar el flujo completo de pedido, cobro, despacho, usuarios y backup/restauración.
 
 ## Reportes mejorados
-La pantalla **Reportes e indicadores** incluye filtros rápidos (Hoy, Esta semana, Este mes y Todos), rango personalizado, filtro por Efectivo/Yape/Plin, total vendido, pedidos despachados, ticket promedio, plato más vendido, tiempo promedio de preparación, ventas por día, distribución por método de pago y detalle de ventas. El reporte puede imprimirse/guardarse como PDF desde el navegador y exportarse a CSV compatible con Excel.
+La pantalla **Reportes e indicadores** incluye filtros rápidos (Hoy, Esta semana, Este mes y Todos), rango personalizado, filtro por Efectivo/Yape/Plin, total vendido, pedidos despachados, ticket promedio, plato más vendido, tiempo promedio de preparación, ventas por día, distribución por método de pago y detalle de ventas. El reporte puede imprimirse/guardarse como PDF desde el navegador y exportarse a un archivo **Excel (.xlsx)** generado en el servidor con Apache POI con tres hojas: *Resumen* (indicadores, ventas por método de pago con porcentaje y ventas por día), *Ventas* (detalle con el total calculado) y *Platos* (ranking de platos por cantidad e importe), listas para imprimir. La exportación respeta los filtros activos y queda registrada en Auditoría.
+
+### Librerías empresariales utilizadas
+| Librería | Uso empresarial | Dónde se aplica en el proyecto |
+|---|---|---|
+| **Apache POI** | Reportes empresariales | `ReporteExcelService`: Excel `.xlsx` con hojas Resumen, Ventas y Platos |
+| **Logback** | Monitoreo de sistemas | Logs en `logs/jarana.log` con el usuario de cada acción; `LogContextoFilter` |
+| **Apache Commons Lang** | Validaciones y utilidades | `StringUtils` en pedidos, usuarios y búsquedas (limpieza y validación de texto) |
+| **Google Guava** | Optimización de código | `Multiset` para el ranking de platos (`ReporteService`) y `Stopwatch` para medir el tiempo del reporte |
+| **Seguridad Java** | Protección de información | Spring Security y BCrypt, bloqueo de cuentas, cookie de sesión `SameSite=Lax`, errores internos sin detalles técnicos (solo una referencia) |
+
+Las versiones están centralizadas en las propiedades del `pom.xml`.
+
+### Pruebas de seguridad
+El informe `PRUEBAS_SEGURIDAD.md` contiene el plan de pruebas, los resultados con evidencias, el registro de incidencias (INC-01 a INC-13) y las tareas pendientes. Las pruebas se pueden repetir con `pruebas/pruebas_seguridad.py` (usar solo una base de datos de pruebas).
+
+### Registro de eventos (logs)
+El sistema escribe logs con Logback en consola y en `logs/jarana.log` (rotación a 5 MB, se conservan 14 días). Cada línea indica quién realizó la acción (por ejemplo `[cajero]`). Se registran los cambios de estado de los pedidos, los pagos, los inicios de sesión correctos y fallidos, los bloqueos de cuenta, la administración de usuarios y del catálogo, los backups y los errores internos. Se puede cambiar la ruta con la variable de entorno `LOG_FILE`.
 
 El tiempo de preparación se calcula desde el inicio de preparación hasta que el pedido se marca Listo. Cuando una prueba dura menos de un minuto, se registra como 1 minuto para evitar reportes con `0 min`.
 
