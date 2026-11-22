@@ -5,6 +5,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.edu.utp.jarana.dto.CrearPedidoRequest;
@@ -17,6 +20,7 @@ import pe.edu.utp.jarana.repository.*;
 
 @Service
 public class PedidoService {
+    private static final Logger log = LoggerFactory.getLogger(PedidoService.class);
     private static final int LIMITE_ELIMINADOS = 50;
 
     private final PedidoRepository pedidoRepository;
@@ -75,6 +79,7 @@ public class PedidoService {
         cargarDetalles(pedido, req.getDetalles());
         pedido = pedidoRepository.save(pedido);
         estructuras.registrarPedido(pedido.getNumero());
+        log.info("Pedido #{} registrado (estado Pendiente)", pedido.getNumero());
         return aResponse(pedido);
     }
 
@@ -97,7 +102,9 @@ public class PedidoService {
         exigirEstado(pedido, EstadoPedido.PENDIENTE, "El pedido debe estar Pendiente");
         pedido.setEstado(EstadoPedido.EN_PREPARACION);
         pedido.setFechaHoraInicioPreparacion(LocalDateTime.now());
-        return aResponse(pedidoRepository.save(pedido));
+        PedidoResponse respuesta = aResponse(pedidoRepository.save(pedido));
+        log.info("Pedido #{} pasó a En preparación", numero);
+        return respuesta;
     }
 
     @Transactional
@@ -106,7 +113,9 @@ public class PedidoService {
         exigirEstado(pedido, EstadoPedido.EN_PREPARACION, "El pedido debe estar En Preparación");
         pedido.setEstado(EstadoPedido.LISTO);
         pedido.setFechaHoraListo(LocalDateTime.now());
-        return aResponse(pedidoRepository.save(pedido));
+        PedidoResponse respuesta = aResponse(pedidoRepository.save(pedido));
+        log.info("Pedido #{} marcado como Listo", numero);
+        return respuesta;
     }
 
     @Transactional
@@ -133,6 +142,7 @@ public class PedidoService {
         }
         venta = ventaRepository.save(venta);
         estructuras.registrarVenta(venta.getIdVenta());
+        log.info("Pedido #{} despachado; venta #{} por S/ {}", numero, venta.getIdVenta(), venta.getTotal());
         return aResponse(pedido);
     }
 
@@ -148,10 +158,13 @@ public class PedidoService {
 
         PedidoEliminado eliminado = new PedidoEliminado();
         eliminado.setPedido(pedido);
-        eliminado.setMotivo(motivo == null || motivo.isBlank() ? "Sin motivo especificado" : motivo.trim());
+        String motivoFinal = StringUtils.defaultIfBlank(StringUtils.trim(motivo), "Sin motivo especificado");
+        if (motivoFinal.length() > 255) throw new ReglaNegocioException("El motivo no puede superar los 255 caracteres");
+        eliminado.setMotivo(motivoFinal);
         eliminado.setFechaHoraEliminacion(LocalDateTime.now());
         eliminado = eliminadoRepository.save(eliminado);
         estructuras.registrarEliminado(eliminado);
+        log.info("Pedido #{} cancelado. Motivo: {}", numero, eliminado.getMotivo());
     }
 
     @Transactional
@@ -184,15 +197,14 @@ public class PedidoService {
         eliminadoRepository.delete(eliminado);
         estructuras.retirarEliminado(eliminado.getIdEliminacion());
         estructuras.registrarPedido(pedido.getNumero());
+        log.info("Pedido #{} restaurado desde eliminados (estado Pendiente)", pedido.getNumero());
         return aResponse(pedido);
     }
 
     public List<PedidoEliminado> listarEliminados() { return eliminadoRepository.findAllByOrderByIdEliminacionDesc(); }
 
     private String normalizarTelefono(String telefono) {
-        if (telefono == null) return null;
-        String limpio = telefono.trim();
-        return limpio.isEmpty() ? null : limpio;
+        return StringUtils.trimToNull(telefono);
     }
 
     private Pedido buscarPedido(Integer numero) {

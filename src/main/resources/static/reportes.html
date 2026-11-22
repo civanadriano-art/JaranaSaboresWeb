@@ -14,7 +14,7 @@
     <a href="/dashboard.html" class="brand"><span class="brand-mark">JS</span><span>La Jarana de Sabores</span></a>
     <div class="user-chip">
       <div class="text-end d-none d-sm-block"><div class="fw-bold small" data-user-name>Usuario</div><div class="role-label" data-user-role>Rol</div></div>
-      <div class="user-avatar">U</div><a class="btn btn-sm btn-light" href="/logout">Salir</a>
+      <div class="user-avatar">U</div><button type="button" class="btn btn-sm btn-light" onclick="cerrarSesion()">Salir</button>
     </div>
   </header>
 
@@ -105,6 +105,27 @@
         </section>
       </div>
     </div>
+
+    <section class="section-card p-4 mb-4" id="seccionAfluencia">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+        <div>
+          <h2 class="report-section-title">Afluencia y personal</h2>
+          <p class="report-section-subtitle">Pedidos promedio por día de la semana, según el historial de pedidos despachados. No depende del filtro de fechas de arriba.</p>
+        </div>
+        <div class="no-print">
+          <label class="form-label small mb-1" for="semanasAfluencia">Periodo analizado</label>
+          <select id="semanasAfluencia" class="form-select form-select-sm" onchange="cargarAfluencia()">
+            <option value="4">Últimas 4 semanas</option>
+            <option value="8" selected>Últimas 8 semanas</option>
+            <option value="12">Últimas 12 semanas</option>
+            <option value="26">Últimas 26 semanas</option>
+          </select>
+        </div>
+      </div>
+      <div id="mensajeAfluencia" class="mb-3"></div>
+      <div id="tablaAfluencia" class="table-responsive"></div>
+      <p class="report-section-subtitle mt-3 mb-0">Criterio: un día se marca como "Alta" cuando su promedio de pedidos supera en 25 % o más al promedio general. Se necesitan al menos 14 días con pedidos y 2 observaciones de ese día de la semana.</p>
+    </section>
 
     <section class="section-card overflow-hidden">
       <div class="p-4 border-bottom d-flex justify-content-between align-items-center gap-2 flex-wrap">

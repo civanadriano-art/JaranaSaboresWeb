@@ -1,5 +1,7 @@
 package pe.edu.utp.jarana.controller;
 
+import pe.edu.utp.jarana.config.PasswordTemporalFilter;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.LinkedHashMap;
@@ -41,8 +43,9 @@ public class AuthController {
     }
 
     @PostMapping("/cambiar-password")
-    public Map<String,String> cambiarPassword(@Valid @RequestBody CambiarPasswordRequest req, Principal principal) {
+    public Map<String,String> cambiarPassword(@Valid @RequestBody CambiarPasswordRequest req, Principal principal, HttpSession sesion) {
         usuarioService.cambiarPasswordPropio(principal.getName(), req);
+        sesion.removeAttribute(PasswordTemporalFilter.ATRIBUTO);
         auditoria.registrar(principal.getName(), "CAMBIAR_PASSWORD", "USUARIO", principal.getName(),
                 "El usuario actualizó su contraseña");
         return Map.of("mensaje", "Contraseña actualizada correctamente");

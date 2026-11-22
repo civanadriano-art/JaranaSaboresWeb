@@ -3,7 +3,7 @@ async function api(url, options={}){
   if(res.status===204)return null;
   const text=await res.text(); let data={};
   try{data=text?JSON.parse(text):{}}catch{data={detalle:text}}
-  if(!res.ok){if(res.status===401){location='/login.html';return} throw new Error(data.error||data.detalle||data.message||`HTTP ${res.status}`)}
+  if(!res.ok){if(res.status===401){location='/login.html';return} throw new Error((data.campos&&Object.values(data.campos)[0])||data.error||data.detalle||data.message||`HTTP ${res.status}`)}
   return data;
 }
 function money(v){return new Intl.NumberFormat('es-PE',{style:'currency',currency:'PEN'}).format(Number(v||0))}
@@ -15,3 +15,9 @@ function showToast(msg,type='success'){
   const el=document.createElement('div');el.className=`alert alert-${type==='error'?'danger':type} shadow mb-2`;el.textContent=msg;z.appendChild(el);setTimeout(()=>el.remove(),3200)
 }
 function showError(e){showToast(e?.message||String(e),'error')}
+
+// Cerrar sesión solo por POST: un enlace externo a /logout ya no puede cerrar la sesión de nadie.
+async function cerrarSesion(){
+  try{await fetch('/logout',{method:'POST'})}catch(e){}
+  location='/login.html?logout';
+}

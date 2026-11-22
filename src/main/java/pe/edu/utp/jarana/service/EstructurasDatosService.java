@@ -3,6 +3,7 @@ package pe.edu.utp.jarana.service;
 import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Locale;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import pe.edu.utp.jarana.estructuras.ArbolAVL;
 import pe.edu.utp.jarana.estructuras.ListaEnlazada;
@@ -81,6 +82,6 @@ public class EstructurasDatosService {
     public synchronized int cantidadVentasEnLista() { return historialVentas.getCantidad(); }
 
     private String normalizar(String valor) {
-        return valor == null ? "" : valor.trim().toLowerCase(Locale.ROOT);
+        return StringUtils.lowerCase(StringUtils.trimToEmpty(valor), Locale.ROOT);
     }
 }

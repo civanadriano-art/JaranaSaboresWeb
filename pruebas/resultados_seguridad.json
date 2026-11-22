@@ -1,0 +1,626 @@
+[
+ {
+  "id": "PS-00",
+  "cat": "Autenticación",
+  "prueba": "Login del administrador inicial",
+  "esperado": "302 → /dashboard.html",
+  "obtenido": "/dashboard.html",
+  "ok": true
+ },
+ {
+  "id": "PS-01",
+  "cat": "Autenticación",
+  "prueba": "Contraseña incorrecta",
+  "esperado": "302 → /login.html?error",
+  "obtenido": "/login.html?error",
+  "ok": true
+ },
+ {
+  "id": "PS-02",
+  "cat": "Autenticación",
+  "prueba": "Usuario inexistente = misma respuesta (sin enumerar)",
+  "esperado": "igual que PS-01",
+  "obtenido": "/login.html?error",
+  "ok": true
+ },
+ {
+  "id": "PS-03",
+  "cat": "Autenticación",
+  "prueba": "Inyección SQL en el usuario del login",
+  "esperado": "acceso rechazado",
+  "obtenido": "/login.html?error",
+  "ok": true
+ },
+ {
+  "id": "PS-04",
+  "cat": "Datos",
+  "prueba": "Contraseña guardada con BCrypt (no en texto plano)",
+  "esperado": "$2a$… y sin la clave",
+  "obtenido": "$2a$10$…",
+  "ok": true
+ },
+ {
+  "id": "PS-05",
+  "cat": "Autenticación",
+  "prueba": "Bloqueo tras 5 intentos; el 6º (incluso con clave correcta) se rechaza",
+  "esperado": "5×?error, luego ?bloqueado",
+  "obtenido": "{'/login.html?error'} → /login.html?bloqueado",
+  "ok": true
+ },
+ {
+  "id": "PS-06",
+  "cat": "Autenticación",
+  "prueba": "El administrador puede desbloquear la cuenta",
+  "esperado": "login permitido",
+  "obtenido": "/cambiar-password.html",
+  "ok": true
+ },
+ {
+  "id": "PS-07",
+  "cat": "Autenticación",
+  "prueba": "Cuenta desactivada no puede ingresar",
+  "esperado": "302 → ?inactivo",
+  "obtenido": "/login.html?inactivo",
+  "ok": true
+ },
+ {
+  "id": "PS-08",
+  "cat": "Autenticación",
+  "prueba": "Sin sesión: GET /dashboard.html",
+  "esperado": "redirige a login / 401",
+  "obtenido": "302 /login.html",
+  "ok": true
+ },
+ {
+  "id": "PS-08",
+  "cat": "Autenticación",
+  "prueba": "Sin sesión: GET /api/pedidos",
+  "esperado": "redirige a login / 401",
+  "obtenido": "302 /login.html",
+  "ok": true
+ },
+ {
+  "id": "PS-08",
+  "cat": "Autenticación",
+  "prueba": "Sin sesión: GET /api/usuarios",
+  "esperado": "redirige a login / 401",
+  "obtenido": "302 /login.html",
+  "ok": true
+ },
+ {
+  "id": "PS-09",
+  "cat": "Autorización",
+  "prueba": "Matriz rol × recurso (41 recursos × 4 perfiles)",
+  "esperado": "100% conforme a las reglas",
+  "obtenido": "161/161 conformes",
+  "ok": true
+ },
+ {
+  "id": "PS-10",
+  "cat": "Autorización",
+  "prueba": "Cajero intenta crear usuarios",
+  "esperado": "403",
+  "obtenido": "403",
+  "ok": true
+ },
+ {
+  "id": "PS-11",
+  "cat": "Autorización",
+  "prueba": "Cocinero intenta registrar un pedido",
+  "esperado": "403",
+  "obtenido": "403",
+  "ok": true
+ },
+ {
+  "id": "PS-12",
+  "cat": "Autorización",
+  "prueba": "Cajero intenta ver reportes y auditoría",
+  "esperado": "403",
+  "obtenido": "403/403",
+  "ok": true
+ },
+ {
+  "id": "PS-13",
+  "cat": "Autorización",
+  "prueba": "Cajero/cocinero intentan restaurar la base de datos",
+  "esperado": "403",
+  "obtenido": "403/403",
+  "ok": true
+ },
+ {
+  "id": "PS-14",
+  "cat": "Sesiones",
+  "prueba": "Cuenta con contraseña TEMPORAL no puede operar la API hasta cambiarla",
+  "esperado": "403",
+  "obtenido": "403",
+  "ok": true
+ },
+ {
+  "id": "PS-15",
+  "cat": "Sesiones",
+  "prueba": "…pero sí puede consultar /api/auth/me y cambiar su contraseña",
+  "esperado": "200",
+  "obtenido": "200",
+  "ok": true
+ },
+ {
+  "id": "PS-16",
+  "cat": "Validación",
+  "prueba": "Cambiar a contraseña solo con letras",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-17",
+  "cat": "Sesiones",
+  "prueba": "Cambio de contraseña válido",
+  "esperado": "200",
+  "obtenido": "200",
+  "ok": true
+ },
+ {
+  "id": "PS-18",
+  "cat": "Sesiones",
+  "prueba": "Tras cambiarla, la misma sesión ya puede operar",
+  "esperado": "201",
+  "obtenido": "201",
+  "ok": true
+ },
+ {
+  "id": "PS-20",
+  "cat": "Validación",
+  "prueba": "Nombre con <script> (XSS)",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-21",
+  "cat": "Validación",
+  "prueba": "Nombre con inyección SQL",
+  "esperado": "400 y las 9 tablas intactas",
+  "obtenido": "400; tablas=9",
+  "ok": true
+ },
+ {
+  "id": "PS-22",
+  "cat": "Validación",
+  "prueba": "Teléfono inválido (letras / 20 dígitos)",
+  "esperado": "400 / 400",
+  "obtenido": "400 / 400",
+  "ok": true
+ },
+ {
+  "id": "PS-23",
+  "cat": "Validación",
+  "prueba": "Pedido sin platos",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-24",
+  "cat": "Validación",
+  "prueba": "Cantidad 0 y negativa",
+  "esperado": "400 / 400",
+  "obtenido": "400 / 400",
+  "ok": true
+ },
+ {
+  "id": "PS-25",
+  "cat": "Validación",
+  "prueba": "Costo extra negativo",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-26",
+  "cat": "Validación",
+  "prueba": "Plato inexistente",
+  "esperado": "400/404",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-27",
+  "cat": "Validación",
+  "prueba": "Cantidad absurda (1 000 000 de platos)",
+  "esperado": "rechazada (límite razonable)",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-28",
+  "cat": "Validación",
+  "prueba": "Costo extra fuera de rango (99 999 999 999)",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-29",
+  "cat": "Validación",
+  "prueba": "Observación de 5 000 caracteres",
+  "esperado": "400 (validado)",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-30",
+  "cat": "Validación",
+  "prueba": "JSON malformado",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-31",
+  "cat": "Validación",
+  "prueba": "Usuario con contraseña de 7 caracteres",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-32",
+  "cat": "Validación",
+  "prueba": "Nombre de usuario con caracteres inválidos",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-33",
+  "cat": "Validación",
+  "prueba": "Usuario duplicado (sin importar mayúsculas)",
+  "esperado": "400/409",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-34",
+  "cat": "Validación",
+  "prueba": "Política de contraseñas: rechaza claves triviales (12345678)",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-35",
+  "cat": "Validación",
+  "prueba": "Nombre de usuario con HTML (el frontend lo escapa: ver PS-36)",
+  "esperado": "aceptado o rechazado",
+  "obtenido": "201",
+  "ok": true
+ },
+ {
+  "id": "PS-36",
+  "cat": "Validación",
+  "prueba": "Frontend escapa los datos antes de mostrarlos (revisión estática de 54 usos de innerHTML)",
+  "esperado": "0 puntos sin escapar",
+  "obtenido": "0 puntos sin escapar",
+  "ok": true
+ },
+ {
+  "id": "PS-37",
+  "cat": "Validación",
+  "prueba": "Contraseña solo con letras",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-38",
+  "cat": "Validación",
+  "prueba": "Plato con nombre de 500 caracteres",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-39",
+  "cat": "Validación",
+  "prueba": "Pedido con 51 líneas (máx. 50)",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-39b",
+  "cat": "Validación",
+  "prueba": "Cantidad 100 (máx. 99)",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-40",
+  "cat": "Integridad",
+  "prueba": "Pedido válido se registra",
+  "esperado": "201",
+  "obtenido": "201",
+  "ok": true
+ },
+ {
+  "id": "PS-41",
+  "cat": "Integridad",
+  "prueba": "Despachar un pedido Pendiente",
+  "esperado": "rechazado",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-42",
+  "cat": "Integridad",
+  "prueba": "Despachar un pedido Listo SIN pago",
+  "esperado": "rechazado",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-43",
+  "cat": "Integridad",
+  "prueba": "Pago en efectivo menor al total",
+  "esperado": "rechazado",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-44",
+  "cat": "Validación",
+  "prueba": "Método de pago inválido (BITCOIN)",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-45",
+  "cat": "Integridad",
+  "prueba": "Pago correcto",
+  "esperado": "201",
+  "obtenido": "201",
+  "ok": true
+ },
+ {
+  "id": "PS-46",
+  "cat": "Integridad",
+  "prueba": "Cobrar dos veces el mismo pedido",
+  "esperado": "rechazado",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-47b",
+  "cat": "Validación",
+  "prueba": "Motivo de cancelación de 5 000 caracteres",
+  "esperado": "400",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-47",
+  "cat": "Integridad",
+  "prueba": "Cancelar un pedido ya pagado",
+  "esperado": "rechazado",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-48",
+  "cat": "Integridad",
+  "prueba": "Despachar con pago",
+  "esperado": "200",
+  "obtenido": "200",
+  "ok": true
+ },
+ {
+  "id": "PS-49",
+  "cat": "Integridad",
+  "prueba": "Cancelar un pedido ya despachado",
+  "esperado": "rechazado",
+  "obtenido": "400",
+  "ok": true
+ },
+ {
+  "id": "PS-50",
+  "cat": "Integridad",
+  "prueba": "Reporte con Guava Multiset sobre MySQL real",
+  "esperado": "platosVendidos y plato más vendido",
+  "obtenido": "Pollo Broaster - Ala / 1 plato(s)",
+  "ok": true
+ },
+ {
+  "id": "PS-51",
+  "cat": "Sesiones",
+  "prueba": "Cookie de sesión HttpOnly + SameSite",
+  "esperado": "HttpOnly; SameSite=Lax",
+  "obtenido": "JSESSIONID=…; Path=/; HttpOnly; SameSite=Lax",
+  "ok": true
+ },
+ {
+  "id": "PS-52",
+  "cat": "Sesiones",
+  "prueba": "Cookie marcada Secure (HTTPS)",
+  "esperado": "Secure",
+  "obtenido": "sin Secure (el sistema funciona por HTTP)",
+  "ok": false
+ },
+ {
+  "id": "PS-53",
+  "cat": "Sesiones",
+  "prueba": "Fijación de sesión: el ID cambia al iniciar sesión",
+  "esperado": "ID distinto",
+  "obtenido": "antes=EAB963… después=4A09B2…",
+  "ok": true
+ },
+ {
+  "id": "PS-54",
+  "cat": "Sesiones",
+  "prueba": "Cerrar sesión redirige al login",
+  "esperado": "302 → /login.html?logout",
+  "obtenido": "/login.html?logout",
+  "ok": true
+ },
+ {
+  "id": "PS-55",
+  "cat": "Sesiones",
+  "prueba": "La sesión cerrada ya no sirve (reutilizar cookie)",
+  "esperado": "denegado",
+  "obtenido": "302",
+  "ok": true
+ },
+ {
+  "id": "PS-56",
+  "cat": "Sesiones",
+  "prueba": "Cerrar sesión solo por POST (evita logout forzado)",
+  "esperado": "GET no cierra sesión",
+  "obtenido": "GET /logout cierra la sesión",
+  "ok": false
+ },
+ {
+  "id": "PS-57",
+  "cat": "Sesiones",
+  "prueba": "Expiración de sesión por inactividad",
+  "esperado": "configurada",
+  "obtenido": "30m",
+  "ok": true
+ },
+ {
+  "id": "PS-58",
+  "cat": "Datos",
+  "prueba": "/api/usuarios no expone hash ni sal",
+  "esperado": "sin passwordHash/passwordSal",
+  "obtenido": "['activo', 'bloqueadoHasta', 'debeCambiarPassword', 'fechaCreacion', 'idUsuario', 'intentosFallidos', 'nombre', 'nombreUsuario', 'rol', 'ultimoAcceso']",
+  "ok": true
+ },
+ {
+  "id": "PS-59",
+  "cat": "Datos",
+  "prueba": "Cabeceras de seguridad básicas",
+  "esperado": "nosniff, DENY, no-store, same-origin",
+  "obtenido": "{'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY', 'Cache-Control': 'no-cache, no-store, max-age=0, must-revalidate', 'Referrer-Policy': 'same-origin'}",
+  "ok": true
+ },
+ {
+  "id": "PS-60",
+  "cat": "Datos",
+  "prueba": "Content-Security-Policy (mitiga XSS)",
+  "esperado": "presente",
+  "obtenido": "ausente",
+  "ok": false
+ },
+ {
+  "id": "PS-61",
+  "cat": "Datos",
+  "prueba": "No revela versión del servidor",
+  "esperado": "sin cabecera Server",
+  "obtenido": "sin cabecera Server",
+  "ok": true
+ },
+ {
+  "id": "PS-62",
+  "cat": "Datos",
+  "prueba": "Archivos internos no accesibles por web (404)",
+  "esperado": "todos 404",
+  "obtenido": "[('/application.properties', 404), ('/pom.xml', 404), ('/.git/config', 404), ('/actuator/health', 404), ('/h2-console', 404), ('/backups/', 404), ('/logs/jarana.log', 404)]",
+  "ok": true
+ },
+ {
+  "id": "PS-63",
+  "cat": "Datos",
+  "prueba": "Las contraseñas no aparecen en los logs",
+  "esperado": "ninguna",
+  "obtenido": "ninguna",
+  "ok": true
+ },
+ {
+  "id": "PS-64",
+  "cat": "Datos",
+  "prueba": "Tráfico cifrado (HTTPS)",
+  "esperado": "HTTPS",
+  "obtenido": "HTTP sin cifrar (Strict-Transport-Security ausente)",
+  "ok": false
+ },
+ {
+  "id": "PS-65",
+  "cat": "Errores",
+  "prueba": "Ruta inexistente / parámetro inválido / método no permitido",
+  "esperado": "404 / 400 / 405 sin detalles técnicos",
+  "obtenido": "404/400/405",
+  "ok": true
+ },
+ {
+  "id": "PS-66",
+  "cat": "Errores",
+  "prueba": "Observación de 5 000 caracteres: no filtra datos internos",
+  "esperado": "mensaje claro sin detalles técnicos",
+  "obtenido": "400: {\"error\":\"Datos inválidos\",\"campos\":{\"detalles[0].observacion\":\"La observación no puede su",
+  "ok": true
+ },
+ {
+  "id": "PS-67",
+  "cat": "Errores",
+  "prueba": "Cantidad 1 000 000: no filtra datos internos",
+  "esperado": "sin detalles técnicos",
+  "obtenido": "400: {\"error\":\"Datos inválidos\",\"campos\":{\"detalles[0].cantidad\":\"La cantidad máxima por plato ",
+  "ok": true
+ },
+ {
+  "id": "PS-68",
+  "cat": "Errores",
+  "prueba": "Solo los errores reales (no 400/404/405) se registran como \"error interno\" en el log",
+  "esperado": "0 falsos errores internos",
+  "obtenido": "0",
+  "ok": true
+ },
+ {
+  "id": "PS-69",
+  "cat": "CSRF",
+  "prueba": "POST de formulario entre sitios (form-urlencoded) con sesión",
+  "esperado": "415 (solo JSON)",
+  "obtenido": "415",
+  "ok": true
+ },
+ {
+  "id": "PS-70",
+  "cat": "CSRF",
+  "prueba": "POST text/plain (técnica de CSRF sin preflight)",
+  "esperado": "415",
+  "obtenido": "415",
+  "ok": true
+ },
+ {
+  "id": "PS-71",
+  "cat": "CSRF",
+  "prueba": "CORS: un sitio externo no recibe permiso",
+  "esperado": "sin Access-Control-Allow-Origin",
+  "obtenido": "302; ACAO=None",
+  "ok": true
+ },
+ {
+  "id": "PS-72",
+  "cat": "Autenticación",
+  "prueba": "40 intentos seguidos desde un mismo origen: limitación por IP",
+  "esperado": "alguno bloqueado (429)",
+  "obtenido": "1 tipo(s) de respuesta, todas {'/login.html?error'} en 3.4s",
+  "ok": false
+ },
+ {
+  "id": "PS-73",
+  "cat": "Autenticación",
+  "prueba": "Un tercero NO debería poder bloquear la cuenta de un administrador",
+  "esperado": "la cuenta sigue accesible",
+  "obtenido": "admin2 con clave correcta → /login.html?bloqueado",
+  "ok": false
+ },
+ {
+  "id": "PS-74",
+  "cat": "Autenticación",
+  "prueba": "Respuesta igual para cuenta bloqueada y cuenta inexistente (sin enumerar)",
+  "esperado": "misma respuesta",
+  "obtenido": "bloqueada=/login.html?bloqueado / inexistente=/login.html?error",
+  "ok": false
+ }
+]

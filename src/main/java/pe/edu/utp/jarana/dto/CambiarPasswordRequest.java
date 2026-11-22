@@ -1,5 +1,6 @@
 package pe.edu.utp.jarana.dto;
 
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -9,6 +10,7 @@ public class CambiarPasswordRequest {
 
     @NotBlank
     @Size(min = 8, max = 72, message = "La nueva contraseña debe tener al menos 8 caracteres")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).*$", message = "La contraseña debe combinar letras y números")
     private String passwordNueva;
 
     public String getPasswordActual() { return passwordActual; }

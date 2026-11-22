@@ -1,8 +1,18 @@
 # Pruebas funcionales — La Jarana de Sabores
 
+## 0. Inicio de sesión
+
+1. Abrir `login.html`: no debe mostrarse ninguna cuenta de demostración.
+2. Ingresar con una contraseña incorrecta: debe aparecer "Usuario o contraseña incorrectos" y el usuario escrito debe conservarse, con el cursor en la contraseña.
+3. Usar el botón **Mostrar** para ver la contraseña y activar Bloq Mayús para comprobar el aviso.
+4. Hacer 5 intentos fallidos con la misma cuenta. En el sexto intento debe aparecer el aviso de cuenta bloqueada temporalmente.
+5. Desactivar una cuenta desde **Usuarios** e intentar ingresar con ella: debe aparecer "Tu cuenta no está disponible".
+6. Ingresar con el administrador inicial y cerrar sesión: debe aparecer "Sesión cerrada correctamente".
+7. Si la base de datos es antigua, verificar en **Usuarios** que `admin`, `cajero` y `cocina` quedaron desactivados.
+
 ## 1. Gestión de usuarios
 
-Ingresar como `admin / admin123` y abrir **Usuarios**.
+Ingresar como administrador (usuario `Esperanza`) y abrir **Usuarios**.
 
 1. Crear un usuario con rol Cajero o Cocinero y una contraseña temporal de 8 o más caracteres.
 2. Cerrar sesión e ingresar con la cuenta nueva.
@@ -56,7 +66,9 @@ Ingresar como Administrador y abrir **Backup**.
 5. Prueba los filtros Hoy, Esta semana, Este mes y un rango personalizado.
 6. Filtra por Efectivo, Yape y Plin y comprueba que las tarjetas, gráficos y tabla cambien conjuntamente.
 7. Confirma que Tiempo promedio de preparación no muestre 0 min para pedidos que sí pasaron por Cocina.
-8. Usa **Exportar Excel** y verifica que el archivo CSV abra correctamente en Excel.
+8. Usa **Exportar Excel** y verifica que se descargue un archivo `.xlsx` con tres hojas: *Resumen* (indicadores, ventas por método de pago con porcentaje y por día), *Ventas* (detalle y fila TOTAL) y *Platos* (ranking de platos vendidos). Cambia los filtros y comprueba que el archivo respete el periodo y el método elegidos.
+8.1. Entra a **Auditoría** y verifica que aparezca el evento `EXPORTAR_REPORTE`.
+8.2. Abre `logs/jarana.log` y verifica que aparezca la línea "Reporte Excel generado" con el usuario entre corchetes, por ejemplo `[admin]`.
 9. Usa **Exportar PDF** y guarda el reporte desde el cuadro de impresión del navegador.
 
 ## Gestión de usuarios mejorada

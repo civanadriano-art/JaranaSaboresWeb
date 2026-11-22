@@ -91,6 +91,30 @@ async function cargarReporte(){
   }catch(e){showError(e)}
 }
 
+function renderAfluencia(r){
+  const nivel={
+    ALTA:['bg-danger','Alta'],
+    NORMAL:['bg-success','Normal'],
+    BAJA:['bg-secondary','Baja'],
+    SIN_DATOS:['bg-light text-dark border','Sin datos']
+  };
+  const tipo=!r.suficiente?'alert-warning':(r.diasRefuerzo.length?'alert-danger':'alert-success');
+  mensajeAfluencia.innerHTML=`<div class="alert ${tipo} mb-0"><strong>${escapeHtml(r.mensaje)}</strong><div class="small mt-1">Periodo: ${textoFecha(r.desde)} al ${textoFecha(r.hasta)} · ${r.diasConDatos} día(s) con pedidos · ${r.totalPedidos} pedido(s) · promedio general ${Number(r.promedioGeneral).toLocaleString('es-PE')} pedidos/día</div></div>`;
+  tablaAfluencia.innerHTML=`<table class="table table-hover table-app"><thead><tr><th>Día</th><th class="text-end">Veces observado</th><th class="text-end">Pedidos/día (prom.)</th><th class="text-end">Vs. promedio</th><th>Hora pico</th><th class="text-end">Prep. prom.</th><th>Afluencia</th><th>Recomendación</th></tr></thead><tbody>${r.dias.map(d=>{
+    const n=nivel[d.nivel]||nivel.SIN_DATOS;
+    const hayDatos=d.diasObservados>0;
+    const variacion=hayDatos&&d.nivel!=='SIN_DATOS'?`${d.variacionPct>0?'+':''}${Number(d.variacionPct).toLocaleString('es-PE')} %`:'—';
+    return `<tr><td><strong>${escapeHtml(d.dia)}</strong></td><td class="text-end">${d.diasObservados}</td><td class="text-end">${hayDatos?Number(d.promedioPedidos).toLocaleString('es-PE'):'—'}</td><td class="text-end">${variacion}</td><td>${d.horaPico?escapeHtml(d.horaPico):'—'}</td><td class="text-end">${d.minutosCocina!=null?`${Number(d.minutosCocina).toLocaleString('es-PE')} min`:'—'}</td><td><span class="badge ${n[0]}">${n[1]}</span></td><td>${escapeHtml(d.recomendacion)}</td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+async function cargarAfluencia(){
+  try{
+    const r=await api('/api/reportes/afluencia?semanas='+semanasAfluencia.value);
+    renderAfluencia(r);
+  }catch(e){showError(e)}
+}
+
 function marcarPeriodo(btn){
   document.querySelectorAll('[data-periodo]').forEach(x=>x.classList.remove('active','btn-jarana'));
   document.querySelectorAll('[data-periodo]').forEach(x=>x.classList.add('btn-outline-secondary'));
@@ -113,26 +137,23 @@ function aplicarPeriodo(tipo,btn){
   cargarReporte();
 }
 
-function csvCampo(v){
-  const s=String(v??'').replace(/"/g,'""');
-  return `"${s}"`;
-}
-
-function exportarExcel(){
+async function exportarExcel(){
   if(!ventasActuales.length){showToast('No hay ventas para exportar','warning');return}
-  const filas=[['Pedido','Cliente','Despacho','Tiempo preparación','Método de pago','Total']];
-  ventasActuales.forEach(v=>filas.push([
-    `#${v.numero}`,
-    v.cliente,
-    fecha(v.fechaHoraDespacho),
-    v.minutosCocina?`${v.minutosCocina} min`:'—',
-    metodoBonito(v.metodoPago),
-    Number(v.total||0).toFixed(2)
-  ]));
-  const contenido='\uFEFF'+filas.map(f=>f.map(csvCampo).join(';')).join('\r\n');
-  const blob=new Blob([contenido],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`reporte_jarana_${fechaISO(new Date())}.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  try{
+    const res=await fetch('/api/reportes/excel'+construirQuery());
+    if(res.status===401){location='/login.html';return}
+    if(!res.ok){
+      const texto=await res.text();let data={};
+      try{data=texto?JSON.parse(texto):{}}catch{data={detalle:texto}}
+      throw new Error(data.error||data.detalle||`HTTP ${res.status}`);
+    }
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=`reporte_jarana_${fechaISO(new Date())}.xlsx`;
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    showToast('Reporte Excel descargado');
+  }catch(e){showError(e)}
 }
 
 function exportarPDF(){
@@ -144,4 +165,5 @@ document.addEventListener('DOMContentLoaded',()=>{
   desde.addEventListener('change',()=>marcarPeriodo(null));
   hasta.addEventListener('change',()=>marcarPeriodo(null));
   cargarReporte();
+  cargarAfluencia();
 });

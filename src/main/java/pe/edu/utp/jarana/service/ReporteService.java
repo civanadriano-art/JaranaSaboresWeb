@@ -1,5 +1,8 @@
 package pe.edu.utp.jarana.service;
 
+import com.google.common.collect.LinkedHashMultiset;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.Multisets;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -52,13 +55,27 @@ public class ReporteService {
                 .count();
         double promedioCocina = ventasConTiempo == 0 ? 0 : (double) sumaMinutos / ventasConTiempo;
 
-        Map<String, Integer> platos = new LinkedHashMap<>();
+        // Guava Multiset: cuenta cuántas veces se vendió cada plato y lo ordena de mayor a menor
+        // (si hay empate, queda primero el que se vendió antes).
+        Multiset<String> platos = LinkedHashMultiset.create();
         ventas.forEach(v -> v.getPedido().getDetalles().forEach(d ->
-                platos.merge(d.getPlato().getNombre(), d.getCantidad(), Integer::sum)));
+                platos.add(d.getPlato().getNombre(), d.getCantidad())));
+        List<Multiset.Entry<String>> ranking = Multisets.copyHighestCountFirst(platos).entrySet().asList();
+        Multiset.Entry<String> topPlato = ranking.isEmpty() ? null : ranking.get(0);
 
-        Map.Entry<String, Integer> topPlato = platos.entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .orElse(null);
+        Map<String, BigDecimal> importePorPlato = new LinkedHashMap<>();
+        ventas.forEach(v -> v.getPedido().getDetalles().forEach(d -> {
+            BigDecimal importe = d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad())).add(d.getCostoExtra());
+            importePorPlato.merge(d.getPlato().getNombre(), importe, BigDecimal::add);
+        }));
+        List<Map<String, Object>> platosVendidos = ranking.stream()
+                .map(e -> {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("plato", e.getElement());
+                    item.put("cantidad", e.getCount());
+                    item.put("importe", importePorPlato.getOrDefault(e.getElement(), BigDecimal.ZERO));
+                    return item;
+                }).toList();
 
         Map<LocalDate, BigDecimal> porDia = new LinkedHashMap<>();
         ventas.stream()
@@ -90,9 +107,10 @@ public class ReporteService {
         r.put("totalVendido", total);
         r.put("pedidosDespachados", ventas.size());
         r.put("ticketPromedio", ticketPromedio);
-        r.put("platoMasVendido", topPlato == null ? "Sin ventas" : topPlato.getKey());
-        r.put("cantidadPlatoMasVendido", topPlato == null ? 0 : topPlato.getValue());
+        r.put("platoMasVendido", topPlato == null ? "Sin ventas" : topPlato.getElement());
+        r.put("cantidadPlatoMasVendido", topPlato == null ? 0 : topPlato.getCount());
         r.put("tiempoPromedioCocina", Math.round(promedioCocina * 10.0) / 10.0);
+        r.put("platosVendidos", platosVendidos);
         r.put("ventasPorDia", ventasPorDia);
         r.put("ventasPorMetodo", ventasPorMetodo);
         return r;
